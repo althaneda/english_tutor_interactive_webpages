@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>句子成分分析器</title>
+<link rel="preconnect" href="https://fonts.googleapis.cnpmjs.org">
+<style>
+  :root {
+    --bg: #0d0f1a;
+    --surface: #141726;
+    --card: #1a1f35;
+    --border: #252c47;
+    --text: #e8eaf2;
+    --muted: #7b82a0;
+    --accent: #4f7cff;
+
+    --subject:    #ff6b6b;
+    --predicate:  #4ecdc4;
+    --object:     #ffe66d;
+    --adverbial:  #a78bfa;
+    --attribute:  #f97316;
+    --predicative:#34d399;
+    --clause:     #60a5fa;
+    --gerund:     #fb7185;
+    --particle:   #94a3b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Noto Serif SC', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Starfield bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(79,124,255,.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(78,205,196,.05) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header { text-align: center; margin-bottom: 48px; }
+
+  header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: .04em;
+    background: linear-gradient(135deg, #4f7cff, #4ecdc4, #ffe66d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  header p { color: var(--muted); font-size: .9rem; font-style: italic; }
+
+  /* Legend */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+  }
+
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: .78rem; color: var(--muted);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: all .2s;
+  }
+  .legend-item:hover { border-color: var(--border); color: var(--text); }
+  .legend-item.active { border-color: currentColor; }
+
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Sentence cards */
+  .sentence-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color .3s;
+  }
+
+  .sentence-card:hover { border-color: var(--accent); }
+  .sentence-card.open { border-color: var(--accent); }
+
+  .card-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #4ecdc4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: bold; color: #fff;
+    flex-shrink: 0;
+  }
+
+  .card-preview {
+    flex: 1;
+    font-size: .85rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-style: italic;
+  }
+
+  .card-arrow {
+    width: 20px; height: 20px; flex-shrink: 0;
+    color: var(--muted);
+    transition: transform .3s;
+  }
+  .sentence-card.open .card-arrow { transform: rotate(180deg); }
+
+  .card-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+    animation: fadeIn .3s ease;
+  }
+  .sentence-card.open .card-body { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* The annotated sentence */
+  .annotated-sentence {
+    font-size: 1.05rem;
+    line-height: 2.4;
+    padding: 20px 0 16px;
+  }
+
+  .chunk {
+    display: inline;
+    padding: 3px 6px;
+    border-radius: 5px;
+    margin: 2px 1px;
+    cursor: pointer;
+    position: relative;
+    transition: all .2s;
+    font-size: 1rem;
+  }
+
+  .chunk:hover { filter: brightness(1.25); transform: translateY(-1px); }
+  .chunk[data-role="subject"]    { background: rgba(255,107,107,.18); color: var(--subject);    border-bottom: 2px solid var(--subject); }
+  .chunk[data-role="predicate"]  { background: rgba(78,205,196,.15);  color: var(--predicate);  border-bottom: 2px solid var(--predicate); }
+  .chunk[data-role="object"]     { background: rgba(255,230,109,.15); color: var(--object);     border-bottom: 2px solid var(--object); }
+  .chunk[data-role="adverbial"]  { background: rgba(167,139,250,.15); color: var(--adverbial);  border-bottom: 2px solid var(--adverbial); }
+  .chunk[data-role="attribute"]  { background: rgba(249,115,22,.15);  color: var(--attribute);  border-bottom: 2px solid var(--attribute); }
+  .chunk[data-role="predicative"]{ background: rgba(52,211,153,.15);  color: var(--predicative);border-bottom: 2px solid var(--predicative); }
+  .chunk[data-role="clause"]     { background: rgba(96,165,250,.12);  color: var(--clause);     border-bottom: 2px dashed var(--clause); }
+  .chunk[data-role="gerund"]     { background: rgba(251,113,133,.15); color: var(--gerund);     border-bottom: 2px solid var(--gerund); }
+  .chunk[data-role="particle"]   { color: var(--particle); font-size:.9em; }
+
+  /* Tooltip */
+  .tooltip-box {
+    position: fixed;
+    background: #252c47;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 16px;
+    max-width: 280px;
+    font-size: .82rem;
+    line-height: 1.6;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  }
+
+  .tooltip-box .tt-role {
+    font-size: .7rem;
+    font-weight: bold;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .tooltip-box .tt-zh { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+
+  /* Analysis breakdown */
+  .breakdown {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .breakdown-item {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .82rem;
+    border-left: 3px solid;
+  }
+
+  .breakdown-item .bi-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    opacity: .6;
+    margin-bottom: 3px;
+  }
+
+  .breakdown-item .bi-text { font-weight: bold; }
+
+  /* Topic tag */
+  .topic-tag {
+    display: inline-block;
+    font-size: .68rem;
+    background: rgba(79,124,255,.15);
+    color: var(--accent);
+    border: 1px solid rgba(79,124,255,.3);
+    border-radius: 20px;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+    letter-spacing: .05em;
+  }
+
+  /* Floating filter */
+  .filter-bar {
+    position: sticky; top: 16px;
+    z-index: 10;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    background: rgba(13,15,26,.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+    font-size: .78rem;
+  }
+
+  .filter-btn {
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    font-size: .78rem;
+  }
+  .filter-btn:hover, .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .dim { opacity: .25; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header>
+  <h1>句子成分互动分析</h1>
+  <p>Click on any colored phrase to explore its grammatical role · 点击彩色词组查看句子成分</p>
+</header>
+
+<!-- Legend -->
+<div class="legend" id="legend">
+  <div class="legend-item" data-role="subject">   <span class="dot" style="background:var(--subject)"></span>主语 Subject</div>
+  <div class="legend-item" data-role="predicate"> <span class="dot" style="background:var(--predicate)"></span>谓语 Predicate</div>
+  <div class="legend-item" data-role="object">    <span class="dot" style="background:var(--object)"></span>宾语 Object</div>
+  <div class="legend-item" data-role="adverbial"> <span class="dot" style="background:var(--adverbial)"></span>状语 Adverbial</div>
+  <div class="legend-item" data-role="attribute"> <span class="dot" style="background:var(--attribute)"></span>定语 Attribute</div>
+  <div class="legend-item" data-role="predicative"><span class="dot" style="background:var(--predicative)"></span>表语 Predicative</div>
+  <div class="legend-item" data-role="clause">    <span class="dot" style="background:var(--clause)"></span>从句 Clause</div>
+  <div class="legend-item" data-role="gerund">    <span class="dot" style="background:var(--gerund)"></span>非谓语 Non-finite</div>
+</div>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+  <span style="color:var(--muted);font-size:.75rem;align-self:center">按主题筛选：</span>
+  <button class="filter-btn active" data-topic="all">全部</button>
+  <button class="filter-btn" data-topic="ocean">🌊 海洋搜救</button>
+  <button class="filter-btn" data-topic="ai">🤖 人工智能</button>
+</div>
+
+<!-- Sentences -->
+<div id="sentences-container"></div>
+
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip-box" id="tooltip">
+  <div class="tt-role" id="tt-role"></div>
+  <div id="tt-desc"></div>
+  <div class="tt-zh" id="tt-zh"></div>
+</div>
+
+<script>
+const ROLES = {
+  subject:     { zh: '主语',   color: 'var(--subject)',     desc: 'Subject — the doer / topic of the sentence' },
+  predicate:   { zh: '谓语',   color: 'var(--predicate)',   desc: 'Predicate — the main verb phrase' },
+  object:      { zh: '宾语',   color: 'var(--object)',      desc: 'Object — receives the action of the verb' },
+  adverbial:   { zh: '状语',   color: 'var(--adverbial)',   desc: 'Adverbial — modifies verb/adj: time, place, manner, reason' },
+  attribute:   { zh: '定语',   color: 'var(--attribute)',   desc: 'Attribute — modifies a noun (like an adjective)' },
+  predicative: { zh: '表语',   color: 'var(--predicative)', desc: 'Predicative — complement after linking verb (be, seem…)' },
+  clause:      { zh: '从句',   color: 'var(--clause)',      desc: 'Clause — subordinate clause (that/if/where/which/because…)' },
+  gerund:      { zh: '非谓语', color: 'var(--gerund)',      desc: 'Non-finite — infinitive / participle / gerund phrase' },
+  particle:    { zh: '标点/连词', color: 'var(--particle)', desc: 'Punctuation / conjunction' },
+};
+
+// Each chunk: [role, text, explanation_zh]
+const SENTENCES = [
+  {
+    id: 1, topic: 'ocean',
+    label: 'Sentence 1 — 状语从句 + 不定式后置定语',
+    chunks: [
+      ['subject',   'Emergency teams',                   '主语：紧急救援队'],
+      ['predicate', 'have',                               '谓语：拥有（have）'],
+      ['attribute', 'little',                             '定语：修饰 time，表示"很少的"'],
+      ['object',    'time',                               '宾语：时间'],
+      ['gerund',    'to rescue those in the water',       '不定式短语作后置定语，修饰 time：去救水中的人'],
+      ['clause',    'because the probability of finding a person alive falls dramatically after six hours',
+                                                          '原因状语从句：因为找到活人的概率在六小时后急剧下降'],
+    ]
+  },
+  {
+    id: 2, topic: 'ocean',
+    label: 'Sentence 2 — 现在分词状语 + 宾语从句',
+    chunks: [
+      ['gerund',    'Using tools from dynamical systems theory and ocean data',
+                                                          '现在分词短语作状语（方式/手段），修饰主句谓语'],
+      ['particle',  ', ',                                 ''],
+      ['subject',   'the team',                           '主语：该团队'],
+      ['predicate', 'has developed',                      '谓语：已研发（现在完成时）'],
+      ['object',    'an algorithm',                       '宾语：一种算法'],
+      ['gerund',    'to predict where objects and people floating in water will go',
+                                                          '不定式短语作后置定语修饰 algorithm；其中含宾语从句 where…will go'],
+    ]
+  },
+  {
+    id: 3, topic: 'ocean',
+    label: "Sentence 3 — 分词后置定语 + 宾语从句 + 限制性定语从句",
+    chunks: [
+      ['subject',   "Haller's research team",             '主语：Haller 研究团队'],
+      ['predicate', 'obtained',                           '谓语：获得（一般过去时）'],
+      ['attribute', 'mathematical',                       '定语：数学的（修饰 results）'],
+      ['object',    'results',                            '宾语：结果'],
+      ['gerund',    'predicting that objects floating on the ocean\'s surface should gather along a few special curves which they call TRAPs',
+                                                          '现在分词短语作后置定语修饰 results；内含 that 宾语从句，从句中 which they call TRAPs 为限制性定语从句'],
+    ]
+  },
+  {
+    id: 4, topic: 'ocean',
+    label: 'Sentence 4 — 并列谓语（被动）+ 分词状语',
+    chunks: [
+      ['subject',   'These curves',                       '主语：这些曲线'],
+      ['predicate', "can't be seen",                      '谓语1：看不见（情态动词 + 被动）'],
+      ['adverbial', 'with our eyes',                      '方式状语：用肉眼'],
+      ['particle',  'but ',                               '并列连词'],
+      ['predicate', 'can be tracked',                     '谓语2：可以被追踪（并列被动谓语）'],
+      ['adverbial', 'from instant ocean surface current data',
+                                                          '方式/来源状语：从即时海面洋流数据'],
+      ['gerund',    'using recent mathematical methods developed by the ETH team',
+                                                          '现在分词短语作状语（手段）；developed by the ETH team 为过去分词后置定语修饰 methods'],
+    ]
+  },
+  {
+    id: 5, topic: 'ai',
+    label: 'Sentence 5 — 动名词主语 + 表语从句',
+    chunks: [
+      ['gerund',    'Flinging brightly coloured objects around a screen at high speed',
+                                                          '动名词短语作主语（充当名词角色）：高速在屏幕上抛掷亮色物体'],
+      ['predicate', 'is not',                             '谓语（系动词 + 否定）'],
+      ['predicative','what computers\' central processing units were designed for',
+                                                          '表语从句（what 引导）：CPU 被设计来做的事'],
+    ]
+  },
+  {
+    id: 6, topic: 'ai',
+    label: 'Sentence 6 — 非限制性定语从句',
+    chunks: [
+      ['subject',   'Every part of entertainment',        '主语：娱乐业的每个部分'],
+      ['predicate', 'stands to be affected',              '谓语：将会受到影响（stands to + 被动不定式）'],
+      ['adverbial', 'by generative AI',                   '施动者状语（被动结构中的 by 短语）：被生成式 AI'],
+      ['clause',    'which digests inputs of text, image, audio or video to create new outputs of the same',
+                                                          '非限制性定语从句，修饰 generative AI；to create 为目的状语'],
+    ]
+  },
+  {
+    id: 7, topic: 'ai',
+    label: 'Sentence 7 — 条件状语从句 + 比较结构',
+    chunks: [
+      ['clause',    'If generative models have to be trained on data to which the developer has the rights',
+                                                          '条件状语从句：如果生成式模型必须在开发者有权使用的数据上训练；to which 为介词前置的定语从句'],
+      ['particle',  ', ',                                 ''],
+      ['subject',   'those with big back-catalogues',     '主语：拥有大型版权库的那些人'],
+      ['predicate', 'will be',                            '谓语：将会是（一般将来时，系动词）'],
+      ['predicative','better placed',                     '表语：处于更有利的位置（形容词短语）'],
+      ['adverbial', 'than startups',                      '比较状语：比初创公司'],
+    ]
+  },
+  {
+    id: 8, topic: 'ai',
+    label: 'Sentence 8 — 条件从句 + 宾语补足语',
+    chunks: [
+      ['clause',    'If we answer this question from a place of fear about what\'s left for people in the age of A.I.',
+                                                          '条件状语从句；about what\'s left 为介词短语接宾语从句，修饰 fear'],
+      ['particle',  ', ',                                 ''],
+      ['subject',   'we',                                 '主语：我们'],
+      ['predicate', 'can end up admitting',               '谓语：最终会承认（情态动词 + end up + 动名词）'],
+      ['object',    'a diminished view of human capability',
+                                                          '宾语：一种对人类能力的矮化认知'],
+    ]
+  },
+  {
+    id: 9, topic: 'ai',
+    label: 'Sentence 9 — 状语 + 宾语从句 + 比较结构',
+    chunks: [
+      ['adverbial', 'Ultimately',                         '时间/总结状语：最终'],
+      ['particle',  ', ',                                 ''],
+      ['adverbial', 'for our society',                    '服务对象状语：对我们的社会而言'],
+      ['particle',  ', ',                                 ''],
+      ['subject',   'this',                               '主语：这（代指上文讨论的问题）'],
+      ['predicate', 'comes down to',                      '谓语短语：归结为'],
+      ['clause',    'whether we believe in the potential of humans with as much belief as we believe in the potential of A.I.',
+                                                          '宾语从句（whether 引导）：我们是否像相信 AI 潜力那样相信人类潜力；as…as 为同等比较结构'],
+    ]
+  },
+];
+
+function buildCard(s) {
+  const card = document.createElement('div');
+  card.className = 'sentence-card';
+  card.dataset.topic = s.topic;
+
+  // header
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  header.innerHTML = `
+    <div class="card-num">${s.id}</div>
+    <div class="card-preview">${s.chunks.map(c=>c[1]).join(' ')}</div>
+    <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  `;
+  header.addEventListener('click', () => {
+    card.classList.toggle('open');
+  });
+  card.appendChild(header);
+
+  // body
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  const topicTag = document.createElement('div');
+  topicTag.style.paddingTop = '14px';
+  topicTag.innerHTML = `<span class="topic-tag">${s.topic === 'ocean' ? '🌊 Ocean Rescue 海洋搜救' : '🤖 AI & Society 人工智能'}</span><br><small style="color:var(--muted);font-size:.75rem">${s.label}</small>`;
+  body.appendChild(topicTag);
+
+  // annotated sentence
+  const sent = document.createElement('div');
+  sent.className = 'annotated-sentence';
+  s.chunks.forEach(([role, text, zh]) => {
+    if (role === 'particle') {
+      const sp = document.createElement('span');
+      sp.className = 'chunk';
+      sp.dataset.role = 'particle';
+      sp.textContent = text;
+      sent.appendChild(sp);
+      return;
+    }
+    const sp = document.createElement('span');
+    sp.className = 'chunk';
+    sp.dataset.role = role;
+    sp.dataset.zh = zh;
+    sp.textContent = text;
+    sp.addEventListener('mouseenter', showTooltip);
+    sp.addEventListener('mousemove', moveTooltip);
+    sp.addEventListener('mouseleave', hideTooltip);
+    sent.appendChild(sp);
+    sent.appendChild(document.createTextNode(' '));
+  });
+  body.appendChild(sent);
+
+  // breakdown
+  const bd = document.createElement('div');
+  bd.className = 'breakdown';
+  s.chunks.filter(c => c[0] !== 'particle').forEach(([role, text, zh]) => {
+    const r = ROLES[role];
+    const item = document.createElement('div');
+    item.className = 'breakdown-item';
+    item.style.borderColor = r.color;
+    item.innerHTML = `<div class="bi-label" style="color:${r.color}">${r.zh} ${role}</div><div class="bi-text">${text.length > 40 ? text.slice(0,40)+'…' : text}</div><div style="font-size:.72rem;color:var(--muted);margin-top:3px">${zh.split('：')[0]}</div>`;
+    bd.appendChild(item);
+  });
+  body.appendChild(bd);
+
+  card.appendChild(body);
+  return card;
+}
+
+// render
+const container = document.getElementById('sentences-container');
+SENTENCES.forEach(s => container.appendChild(buildCard(s)));
+
+// tooltip
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e) {
+  const role = e.target.dataset.role;
+  const zh = e.target.dataset.zh;
+  const r = ROLES[role];
+  if (!r) return;
+  document.getElementById('tt-role').style.color = r.color;
+  document.getElementById('tt-role').textContent = `${r.zh.toUpperCase()} · ${role.toUpperCase()}`;
+  document.getElementById('tt-desc').textContent = r.desc;
+  document.getElementById('tt-zh').textContent = zh || '';
+  tooltip.style.display = 'block';
+  moveTooltip(e);
+}
+function moveTooltip(e) {
+  let x = e.clientX + 16, y = e.clientY + 16;
+  if (x + 300 > window.innerWidth) x = e.clientX - 300;
+  if (y + 120 > window.innerHeight) y = e.clientY - 120;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
+function hideTooltip() { tooltip.style.display = 'none'; }
+
+// filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const topic = btn.dataset.topic;
+    document.querySelectorAll('.sentence-card').forEach(card => {
+      if (topic === 'all' || card.dataset.topic === topic) {
+        card.classList.remove('dim');
+      } else {
+        card.classList.add('dim');
+        card.classList.remove('open');
+      }
+    });
+  });
+});
+
+// expand first card by default
+document.querySelector('.sentence-card').classList.add('open');
+</script>
+</body>
+</html>

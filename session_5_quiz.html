@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>英语句子成分互动分析</title>
+  <!-- CDN: 字体 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.cnpmjs.org/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap"/>
+  <!-- CDN: animate.css -->
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #21243a;
+      --accent: #7c6af7;
+      --accent2: #4fc3f7;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --S: #ff6b6b;   /* 主语 */
+      --V: #ffd93d;   /* 谓语 */
+      --O: #6bcb77;   /* 宾语 */
+      --P: #4d96ff;   /* 表语 */
+      --Adv: #c77dff; /* 状语 */
+      --Att: #ff9f43; /* 定语 */
+      --C: #48dbfb;   /* 从句 */
+      --Ger: #fd79a8; /* 动名词/分词 */
+      --border-r: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+      border-bottom: 1px solid rgba(124,106,247,0.2);
+      padding: 24px 32px 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    header .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 700; }
+    header p { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .subtitle-badge {
+      margin-left: auto;
+      background: rgba(124,106,247,0.15);
+      border: 1px solid rgba(124,106,247,0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+
+    /* ===== LEGEND ===== */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 8px 16px;
+      padding: 16px 32px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ===== LAYOUT ===== */
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 0;
+      min-height: calc(100vh - 120px);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: var(--card);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      padding: 0 20px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+    }
+    .sent-btn {
+      display: block; width: 100%;
+      padding: 14px 20px;
+      background: none; border: none;
+      text-align: left; cursor: pointer;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      border-left: 3px solid transparent;
+      transition: all 0.18s;
+      position: relative;
+    }
+    .sent-btn:hover {
+      background: rgba(124,106,247,0.06);
+      color: var(--text);
+      border-left-color: rgba(124,106,247,0.4);
+    }
+    .sent-btn.active {
+      background: rgba(124,106,247,0.12);
+      color: #fff;
+      border-left-color: var(--accent);
+    }
+    .sent-btn .num {
+      font-size: 0.68rem;
+      background: rgba(124,106,247,0.2);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 1px 6px;
+      margin-right: 6px;
+      font-weight: 700;
+    }
+    .sent-btn.active .num {
+      background: var(--accent);
+      color: #fff;
+    }
+    .sent-btn .preview {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ===== MAIN PANEL ===== */
+    .main {
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+    .sentence-card {
+      background: var(--card);
+      border-radius: var(--border-r);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+    .sentence-card .sent-num {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .sentence-text {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      font-weight: 400;
+    }
+    .sentence-text .token {
+      display: inline;
+      padding: 2px 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .sentence-text .token:hover {
+      filter: brightness(1.3);
+      transform: translateY(-1px);
+    }
+    .sentence-text .token.S  { background: rgba(255,107,107,0.18); color: var(--S); }
+    .sentence-text .token.V  { background: rgba(255,217,61,0.18);  color: var(--V); }
+    .sentence-text .token.O  { background: rgba(107,203,119,0.18); color: var(--O); }
+    .sentence-text .token.P  { background: rgba(77,150,255,0.18);  color: var(--P); }
+    .sentence-text .token.Adv{ background: rgba(199,125,255,0.18); color: var(--Adv); }
+    .sentence-text .token.Att{ background: rgba(255,159,67,0.18);  color: var(--Att); }
+    .sentence-text .token.C  { background: rgba(72,219,251,0.14);  color: var(--C); }
+    .sentence-text .token.Ger{ background: rgba(253,121,168,0.18); color: var(--Ger); }
+
+    /* tooltip */
+    .token-tooltip {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      background: #252840;
+      border: 1px solid rgba(124,106,247,0.4);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #fff;
+      pointer-events: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      max-width: 260px;
+    }
+    .token-tooltip .tt-role { font-weight: 700; font-size: 0.9rem; }
+    .token-tooltip .tt-desc { color: var(--muted); margin-top: 3px; }
+
+    /* ===== ANALYSIS CARDS ===== */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 0;
+    }
+    .ana-card {
+      background: var(--card2);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 16px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .ana-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+    }
+    .ana-card .ac-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 8px;
+    }
+    .ac-badge {
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .ac-S   { background: rgba(255,107,107,0.2);  color: var(--S);   border: 1px solid rgba(255,107,107,0.3); }
+    .ac-V   { background: rgba(255,217,61,0.2);   color: var(--V);   border: 1px solid rgba(255,217,61,0.3); }
+    .ac-O   { background: rgba(107,203,119,0.2);  color: var(--O);   border: 1px solid rgba(107,203,119,0.3); }
+    .ac-P   { background: rgba(77,150,255,0.2);   color: var(--P);   border: 1px solid rgba(77,150,255,0.3); }
+    .ac-Adv { background: rgba(199,125,255,0.2);  color: var(--Adv); border: 1px solid rgba(199,125,255,0.3); }
+    .ac-Att { background: rgba(255,159,67,0.2);   color: var(--Att); border: 1px solid rgba(255,159,67,0.3); }
+    .ac-C   { background: rgba(72,219,251,0.18);  color: var(--C);   border: 1px solid rgba(72,219,251,0.25); }
+    .ac-Ger { background: rgba(253,121,168,0.2);  color: var(--Ger); border: 1px solid rgba(253,121,168,0.3); }
+    .ac-label { font-size: 0.78rem; color: var(--muted); }
+    .ac-content {
+      font-size: 0.83rem;
+      line-height: 1.5;
+      color: var(--text);
+      font-style: italic;
+    }
+    .ac-note {
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-top: 5px;
+      font-style: normal;
+    }
+
+    /* ===== STRUCTURE TREE ===== */
+    .tree-section {
+      margin-top: 20px;
+    }
+    .tree-section h3 {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .tree {
+      background: var(--card2);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 18px 20px;
+      font-size: 0.82rem;
+      line-height: 2;
+    }
+    .tree-row { display: flex; align-items: flex-start; }
+    .tree-indent { width: 24px; flex-shrink: 0; position: relative; }
+    .tree-indent::before {
+      content: '';
+      position: absolute;
+      left: 10px; top: 0; bottom: 0;
+      border-left: 1px dashed rgba(255,255,255,0.1);
+    }
+    .tree-row:last-child .tree-indent::before { height: 14px; }
+    .tree-connector {
+      color: rgba(255,255,255,0.15);
+      margin-right: 6px;
+      font-size: 0.7rem;
+    }
+
+    /* ===== QUIZ MODE ===== */
+    .quiz-bar {
+      background: var(--card);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 12px 32px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .quiz-bar span { font-size: 0.82rem; color: var(--muted); }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #9b8bf9; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    .btn-secondary.active {
+      background: rgba(124,106,247,0.2);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* quiz overlay */
+    .quiz-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .quiz-box {
+      background: #1e2138;
+      border: 1px solid rgba(124,106,247,0.3);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 560px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .quiz-box h2 { font-size: 1.1rem; margin-bottom: 6px; }
+    .quiz-box .q-sent {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--accent2);
+      margin: 14px 0;
+      line-height: 1.6;
+    }
+    .quiz-box .q-question { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; }
+    .quiz-options {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .quiz-opt {
+      padding: 11px 14px;
+      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.83rem;
+      color: var(--text);
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .quiz-opt:hover { border-color: var(--accent); background: rgba(124,106,247,0.1); }
+    .quiz-opt.correct { border-color: #6bcb77; background: rgba(107,203,119,0.15); color: #6bcb77; }
+    .quiz-opt.wrong   { border-color: #ff6b6b; background: rgba(255,107,107,0.12); color: #ff6b6b; }
+    .quiz-feedback {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+    }
+    .quiz-feedback.ok { background: rgba(107,203,119,0.12); color: #6bcb77; }
+    .quiz-feedback.no { background: rgba(255,107,107,0.12); color: #ff6b6b; }
+    .quiz-nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    .score-display {
+      font-size: 0.82rem;
+      color: var(--accent2);
+      margin-left: auto;
+    }
+
+    /* progress bar */
+    .progress-bar-wrap {
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 32px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    /* section label */
+    .section-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin: 20px 0 10px;
+    }
+
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔍</div>
+  <div>
+    <h1>英语句子成分互动分析器</h1>
+    <p>点击高亮词块查看成分标注 · 悬停查看详细说明</p>
+  </div>
+  <div class="subtitle-badge">9 Sentences · Interactive</div>
+</header>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--S)"></div>主语 Subject</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--V)"></div>谓语 Verb</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--O)"></div>宾语 Object</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--P)"></div>表语 Predicative</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--Adv)"></div>状语 Adverbial</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--Att)"></div>定语 Attributive</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--C)"></div>从句 Clause</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--Ger)"></div>动名词/分词 Gerund/Participle</div>
+</div>
+
+<!-- Progress -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressFill" style="width:11.1%"></div>
+</div>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-title">选择句子</div>
+    <div id="sentList"></div>
+  </div>
+
+  <!-- Main -->
+  <div class="main" id="mainPanel"></div>
+</div>
+
+<!-- Quiz Bar -->
+<div class="quiz-bar">
+  <span>已学习 <strong id="learnedCount">0</strong>/9 句</span>
+  <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+    <span class="score-display" id="scoreDisplay"></span>
+    <button class="btn btn-secondary" id="btnToggleMode" onclick="startQuiz()">🎯 挑战测验</button>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="token-tooltip" id="tooltip">
+  <div class="tt-role" id="ttRole"></div>
+  <div class="tt-desc" id="ttDesc"></div>
+</div>
+
+<!-- Quiz Overlay -->
+<div class="quiz-overlay" id="quizOverlay" style="display:none;">
+  <div class="quiz-box animate__animated animate__fadeInUp">
+    <h2>🎯 语法成分测验</h2>
+    <div class="q-sent" id="qSent"></div>
+    <div class="q-question" id="qQuestion"></div>
+    <div class="quiz-options" id="qOptions"></div>
+    <div class="quiz-feedback" id="qFeedback" style="display:none;"></div>
+    <div class="quiz-nav">
+      <button class="btn btn-secondary" onclick="closeQuiz()">关闭</button>
+      <button class="btn btn-primary" id="btnNext" onclick="nextQuiz()" style="display:none;">下一题 →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const sentences = [
+  {
+    id: 1,
+    text: "Emergency teams have little time to rescue those in the water because the probability of finding a person alive falls dramatically after six hours.",
+    tokens: [
+      {t:"Emergency teams", role:"S", label:"主语", desc:"名词短语作主语"},
+      {t:" ", role:""},
+      {t:"have", role:"V", label:"谓语", desc:"动词，have 表示'有'"},
+      {t:" "},
+      {t:"little time to rescue those in the water", role:"O", label:"宾语", desc:"名词短语作宾语，to rescue... 不定式后置定语修饰 time"},
+      {t:" "},
+      {t:"because the probability of finding a person alive falls dramatically after six hours", role:"C", label:"原因状语从句", desc:"because 引导原因状语从句；主语: the probability of finding a person alive；谓语: falls dramatically；时间状语: after six hours"},
+    ],
+    analysis: [
+      {role:"S", label:"主语", content:"Emergency teams", note:"应急救援团队"},
+      {role:"V", label:"谓语", content:"have", note:"拥有（有）"},
+      {role:"O", label:"宾语", content:"little time to rescue those in the water", note:"不定式短语 to rescue those in the water 作后置定语修饰 time"},
+      {role:"C", label:"原因状语从句", content:"because the probability ... falls dramatically after six hours", note:"because 引导；从句主语为 the probability of finding a person alive"},
+    ],
+    tree: [
+      {indent:0, badge:"S", text:"Emergency teams"},
+      {indent:0, badge:"V", text:"have"},
+      {indent:0, badge:"O", text:"little time"},
+      {indent:1, badge:"Att", text:"to rescue those in the water（不定式定语）"},
+      {indent:0, badge:"C", text:"because... [原因状语从句]"},
+      {indent:1, badge:"S", text:"the probability of finding a person alive"},
+      {indent:1, badge:"V", text:"falls dramatically"},
+      {indent:1, badge:"Adv", text:"after six hours"},
+    ]
+  },
+  {
+    id: 2,
+    text: "Using tools from dynamical systems theory and ocean data, the team has developed an algorithm to predict where objects and people floating in water will go.",
+    tokens: [
+      {t:"Using tools from dynamical systems theory and ocean data", role:"Ger", label:"分词状语", desc:"现在分词短语作方式状语，修饰主句"},
+      {t:", "},
+      {t:"the team", role:"S", label:"主语", desc:"名词短语作主语"},
+      {t:" "},
+      {t:"has developed", role:"V", label:"谓语", desc:"现在完成时，has developed"},
+      {t:" "},
+      {t:"an algorithm", role:"O", label:"宾语", desc:"名词短语，后接不定式定语"},
+      {t:" "},
+      {t:"to predict where objects and people floating in water will go", role:"Att", label:"不定式定语+宾语从句", desc:"不定式 to predict 修饰 algorithm；where 引导宾语从句"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"Ger", label:"分词状语（方式）", content:"Using tools from dynamical systems theory and ocean data", note:"现在分词短语，修饰主句，表方式"},
+      {role:"S", label:"主语", content:"the team", note:""},
+      {role:"V", label:"谓语", content:"has developed", note:"现在完成时"},
+      {role:"O", label:"宾语", content:"an algorithm", note:""},
+      {role:"Att", label:"不定式后置定语", content:"to predict where objects... will go", note:"where 引导嵌套宾语从句"},
+    ],
+    tree: [
+      {indent:0, badge:"Ger", text:"Using tools...（分词方式状语）"},
+      {indent:0, badge:"S", text:"the team"},
+      {indent:0, badge:"V", text:"has developed"},
+      {indent:0, badge:"O", text:"an algorithm"},
+      {indent:1, badge:"Att", text:"to predict...（不定式定语）"},
+      {indent:2, badge:"C", text:"where... will go（宾语从句）"},
+      {indent:3, badge:"S", text:"objects and people floating in water"},
+      {indent:3, badge:"V", text:"will go"},
+    ]
+  },
+  {
+    id: 3,
+    text: "Haller's research team obtained mathematical results predicting that objects floating on the ocean's surface should gather along a few special curves which they call TRansient Attracting Profiles (TRAPs).",
+    tokens: [
+      {t:"Haller's research team", role:"S", label:"主语", desc:"名词短语，Haller's 作定语"},
+      {t:" "},
+      {t:"obtained", role:"V", label:"谓语", desc:"过去式，获得"},
+      {t:" "},
+      {t:"mathematical results", role:"O", label:"宾语", desc:"名词短语作宾语"},
+      {t:" "},
+      {t:"predicting that objects floating on the ocean's surface should gather along a few special curves", role:"Att", label:"分词定语+宾语从句", desc:"predicting 现在分词短语修饰 results；that 引导宾语从句"},
+      {t:" "},
+      {t:"which they call TRansient Attracting Profiles (TRAPs)", role:"C", label:"定语从句", desc:"关系代词 which 引导限制性定语从句，修饰 curves"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"S", label:"主语", content:"Haller's research team", note:""},
+      {role:"V", label:"谓语", content:"obtained", note:"过去时"},
+      {role:"O", label:"宾语", content:"mathematical results", note:""},
+      {role:"Att", label:"分词后置定语", content:"predicting that...", note:"现在分词修饰 results，内含 that 引导宾语从句"},
+      {role:"C", label:"限制性定语从句", content:"which they call TRAPs", note:"which 代指 curves，说明其名称"},
+    ],
+    tree: [
+      {indent:0, badge:"S", text:"Haller's research team"},
+      {indent:0, badge:"V", text:"obtained"},
+      {indent:0, badge:"O", text:"mathematical results"},
+      {indent:1, badge:"Ger", text:"predicting...（分词定语）"},
+      {indent:2, badge:"C", text:"that... should gather...（宾语从句）"},
+      {indent:3, badge:"S", text:"objects floating on the ocean's surface"},
+      {indent:3, badge:"V", text:"should gather"},
+      {indent:3, badge:"Adv", text:"along a few special curves"},
+      {indent:4, badge:"C", text:"which they call TRAPs（定语从句）"},
+    ]
+  },
+  {
+    id: 4,
+    text: "These curves can't be seen with our eyes but can be tracked from instant ocean surface current data using recent mathematical methods developed by the ETH team.",
+    tokens: [
+      {t:"These curves", role:"S", label:"主语", desc:"名词短语，these 作限定词"},
+      {t:" "},
+      {t:"can't be seen", role:"V", label:"谓语（被动）", desc:"情态动词+被动语态，不能被……看到"},
+      {t:" "},
+      {t:"with our eyes", role:"Adv", label:"方式状语", desc:"介词短语作方式状语"},
+      {t:" but "},
+      {t:"can be tracked", role:"V", label:"并列谓语（被动）", desc:"并列谓语，可以被追踪"},
+      {t:" "},
+      {t:"from instant ocean surface current data", role:"Adv", label:"来源状语", desc:"介词短语，表示数据来源"},
+      {t:" "},
+      {t:"using recent mathematical methods developed by the ETH team", role:"Adv", label:"方式状语（分词）", desc:"分词短语作方式状语；developed by the ETH team 为过去分词修饰 methods"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"S", label:"主语", content:"These curves", note:""},
+      {role:"V", label:"谓语1（被动）", content:"can't be seen", note:"情态被动"},
+      {role:"Adv", label:"方式状语1", content:"with our eyes", note:"介词短语"},
+      {role:"V", label:"并列谓语2（被动）", content:"can be tracked", note:"情态被动，与谓语1并列"},
+      {role:"Adv", label:"来源状语", content:"from instant ocean surface current data", note:""},
+      {role:"Adv", label:"方式状语2（分词）", content:"using recent mathematical methods...", note:"分词短语，methods 被 developed by the ETH team 修饰"},
+    ],
+    tree: [
+      {indent:0, badge:"S", text:"These curves"},
+      {indent:0, badge:"V", text:"can't be seen（被动）"},
+      {indent:1, badge:"Adv", text:"with our eyes"},
+      {indent:0, badge:"V", text:"but can be tracked（被动，并列）"},
+      {indent:1, badge:"Adv", text:"from instant ocean surface current data"},
+      {indent:1, badge:"Adv", text:"using recent mathematical methods...（分词状语）"},
+      {indent:2, badge:"Att", text:"developed by the ETH team（过去分词定语）"},
+    ]
+  },
+  {
+    id: 5,
+    text: "Flinging brightly coloured objects around a screen at high speed is not what computers' central processing units were designed for.",
+    tokens: [
+      {t:"Flinging brightly coloured objects around a screen at high speed", role:"S", label:"主语（动名词短语）", desc:"动名词短语作主语，Flinging 为动名词"},
+      {t:" "},
+      {t:"is not", role:"V", label:"谓语", desc:"系动词 is，否定形式"},
+      {t:" "},
+      {t:"what computers' central processing units were designed for", role:"P", label:"表语从句", desc:"what 引导表语从句；were designed for 为被动语态"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"S", label:"主语（动名词）", content:"Flinging brightly coloured objects around a screen at high speed", note:"整个动名词短语作主语"},
+      {role:"V", label:"谓语（系动词）", content:"is not", note:"否定系动词"},
+      {role:"P", label:"表语从句", content:"what computers' CPUs were designed for", note:"what 引导，were designed for 为被动"},
+    ],
+    tree: [
+      {indent:0, badge:"S", text:"Flinging... at high speed（动名词主语）"},
+      {indent:1, badge:"O", text:"brightly coloured objects（动名词的宾语）"},
+      {indent:1, badge:"Adv", text:"around a screen / at high speed"},
+      {indent:0, badge:"V", text:"is not"},
+      {indent:0, badge:"P", text:"what CPUs were designed for（表语从句）"},
+      {indent:1, badge:"S", text:"computers' central processing units"},
+      {indent:1, badge:"V", text:"were designed for（被动）"},
+    ]
+  },
+  {
+    id: 6,
+    text: "Every part of entertainment stands to be affected by generative AI, which digests inputs of text, image, audio or video to create new outputs of the same.",
+    tokens: [
+      {t:"Every part of entertainment", role:"S", label:"主语", desc:"名词短语，every 作限定词，of entertainment 作后置定语"},
+      {t:" "},
+      {t:"stands to be affected by generative AI", role:"V", label:"谓语", desc:"stands to be affected = 有可能被……影响，被动不定式"},
+      {t:", "},
+      {t:"which digests inputs of text, image, audio or video to create new outputs of the same", role:"C", label:"非限制性定语从句", desc:"which 代指 generative AI；to create... 表目的"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"S", label:"主语", content:"Every part of entertainment", note:""},
+      {role:"V", label:"谓语", content:"stands to be affected by generative AI", note:"stands to = 很可能会；被动不定式"},
+      {role:"C", label:"非限制性定语从句", content:"which digests inputs... to create new outputs", note:"先行词 generative AI；to create 表目的"},
+    ],
+    tree: [
+      {indent:0, badge:"S", text:"Every part of entertainment"},
+      {indent:0, badge:"V", text:"stands to be affected"},
+      {indent:1, badge:"Adv", text:"by generative AI（施动者）"},
+      {indent:0, badge:"C", text:"which...（非限制性定语从句）"},
+      {indent:1, badge:"S", text:"which（= generative AI）"},
+      {indent:1, badge:"V", text:"digests"},
+      {indent:1, badge:"O", text:"inputs of text, image, audio or video"},
+      {indent:1, badge:"Adv", text:"to create new outputs（目的状语）"},
+    ]
+  },
+  {
+    id: 7,
+    text: "If generative models have to be trained on data to which the developer has the rights, those with big back-catalogues will be better placed than startups.",
+    tokens: [
+      {t:"If generative models have to be trained on data to which the developer has the rights", role:"C", label:"条件状语从句", desc:"if 引导条件状语从句；to which the developer has the rights 为介词+关系代词引导的定语从句，修饰 data"},
+      {t:", "},
+      {t:"those with big back-catalogues", role:"S", label:"主语", desc:"those = 那些人/公司，with big back-catalogues 作后置定语"},
+      {t:" "},
+      {t:"will be better placed than startups", role:"V", label:"谓语+比较级", desc:"will be placed 为被动式；better...than 为比较级"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"C", label:"条件状语从句", content:"If generative models have to be trained on data...", note:"to which the developer has the rights：介词+关系代词定语从句修饰 data"},
+      {role:"S", label:"主语", content:"those with big back-catalogues", note:"those 指代拥有大量历史内容的公司/机构"},
+      {role:"V", label:"谓语（比较级）", content:"will be better placed than startups", note:"be placed = 处于有利地位，比较级 better...than"},
+    ],
+    tree: [
+      {indent:0, badge:"C", text:"If... [条件从句]"},
+      {indent:1, badge:"S", text:"generative models"},
+      {indent:1, badge:"V", text:"have to be trained（被动）"},
+      {indent:1, badge:"Adv", text:"on data"},
+      {indent:2, badge:"C", text:"to which the developer has the rights（定语从句）"},
+      {indent:0, badge:"S", text:"those with big back-catalogues"},
+      {indent:0, badge:"V", text:"will be better placed than startups"},
+    ]
+  },
+  {
+    id: 8,
+    text: "If we answer this question from a place of fear about what's left for people in the age of A.I., we can end up admitting a diminished view of human capability.",
+    tokens: [
+      {t:"If we answer this question from a place of fear about what's left for people in the age of A.I.", role:"C", label:"条件状语从句", desc:"if 引导条件从句；what's left for people in the age of A.I. 为 about 的宾语从句"},
+      {t:", "},
+      {t:"we", role:"S", label:"主语", desc:"第一人称复数"},
+      {t:" "},
+      {t:"can end up admitting", role:"V", label:"谓语", desc:"end up + 动名词，最终会……"},
+      {t:" "},
+      {t:"a diminished view of human capability", role:"O", label:"宾语", desc:"名词短语；diminished 作定语"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"C", label:"条件状语从句", content:"If we answer this question from a place of fear...", note:"what's left for people in the age of A.I. 是 about 的宾语从句"},
+      {role:"S", label:"主语", content:"we", note:""},
+      {role:"V", label:"谓语", content:"can end up admitting", note:"end up + Ving = 最终以……收场"},
+      {role:"O", label:"宾语", content:"a diminished view of human capability", note:"diminished 过去分词作定语"},
+    ],
+    tree: [
+      {indent:0, badge:"C", text:"If we answer this question...（条件从句）"},
+      {indent:1, badge:"Adv", text:"from a place of fear"},
+      {indent:2, badge:"C", text:"about what's left for people...（宾语从句）"},
+      {indent:0, badge:"S", text:"we"},
+      {indent:0, badge:"V", text:"can end up admitting"},
+      {indent:0, badge:"O", text:"a diminished view of human capability"},
+    ]
+  },
+  {
+    id: 9,
+    text: "Ultimately, for our society, this comes down to whether we believe in the potential of humans with as much belief as we believe in the potential of A.I.",
+    tokens: [
+      {t:"Ultimately", role:"Adv", label:"语气副词", desc:"副词，修饰整句，表示'归根结底'"},
+      {t:", "},
+      {t:"for our society", role:"Adv", label:"介词短语状语", desc:"for our society 作状语，说明范围"},
+      {t:", "},
+      {t:"this", role:"S", label:"主语", desc:"指示代词，指代上文提到的问题"},
+      {t:" "},
+      {t:"comes down to", role:"V", label:"谓语（短语动词）", desc:"comes down to = 归结为，短语动词"},
+      {t:" "},
+      {t:"whether we believe in the potential of humans with as much belief as we believe in the potential of A.I.", role:"O", label:"宾语从句", desc:"whether 引导名词性从句；as much...as... 为等量比较结构"},
+      {t:"."},
+    ],
+    analysis: [
+      {role:"Adv", label:"语气副词", content:"Ultimately", note:"修饰整句，'归根结底'"},
+      {role:"Adv", label:"范围状语", content:"for our society", note:"介词短语"},
+      {role:"S", label:"主语", content:"this", note:"指示代词，指代前文话题"},
+      {role:"V", label:"谓语（短语动词）", content:"comes down to", note:"= 归结为"},
+      {role:"O", label:"宾语从句（whether）", content:"whether we believe in the potential of humans...", note:"as much belief as we believe in A.I. 为 as...as 比较结构"},
+    ],
+    tree: [
+      {indent:0, badge:"Adv", text:"Ultimately（语气副词）"},
+      {indent:0, badge:"Adv", text:"for our society（范围状语）"},
+      {indent:0, badge:"S", text:"this"},
+      {indent:0, badge:"V", text:"comes down to"},
+      {indent:0, badge:"C", text:"whether...（宾语从句）"},
+      {indent:1, badge:"S", text:"we"},
+      {indent:1, badge:"V", text:"believe in"},
+      {indent:1, badge:"O", text:"the potential of humans"},
+      {indent:1, badge:"Adv", text:"with as much belief as we believe in A.I.（比较结构）"},
+    ]
+  }
+];
+
+// Quiz questions
+const quizQuestions = [
+  {si:0, q:"句子1中，'because the probability... falls dramatically' 是什么成分？", correct:"原因状语从句", options:["主语从句","原因状语从句","定语从句","表语从句"]},
+  {si:1, q:"句子2中，'Using tools from dynamical systems theory' 这个分词短语作什么成分？", correct:"方式状语", options:["主语","方式状语","宾语","定语"]},
+  {si:2, q:"句子3中，'which they call TRAPs' 是什么类型的从句？", correct:"限制性定语从句", options:["非限制性定语从句","限制性定语从句","宾语从句","条件从句"]},
+  {si:3, q:"句子4中，'These curves' 充当什么句子成分？", correct:"主语", options:["宾语","主语","状语","表语"]},
+  {si:4, q:"句子5中，整个句子的主语是什么类型？", correct:"动名词短语", options:["名词短语","动名词短语","不定式短语","从句"]},
+  {si:5, q:"句子6中，'which digests inputs...' 是什么类型的定语从句？", correct:"非限制性定语从句", options:["限制性定语从句","非限制性定语从句","同位语从句","主语从句"]},
+  {si:6, q:"句子7中，'to which the developer has the rights' 修饰哪个词？", correct:"data", options:["models","rights","startups","data"]},
+  {si:7, q:"句子8中，'end up admitting' 后接的是什么词形？", correct:"动名词", options:["不定式","过去分词","动名词","现在分词"]},
+  {si:8, q:"句子9中，'comes down to' 后面的 whether 从句充当什么成分？", correct:"宾语", options:["主语","状语","宾语","表语"]},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentIdx = 0;
+let learnedSet = new Set();
+let quizScore = 0;
+let quizTotal = 0;
+let quizIdx = 0;
+let quizAnswered = false;
+
+// ============================================================
+// RENDER SIDEBAR
+// ============================================================
+function renderSidebar() {
+  const list = document.getElementById('sentList');
+  list.innerHTML = sentences.map((s, i) => `
+    <button class="sent-btn ${i===currentIdx?'active':''}" onclick="selectSentence(${i})">
+      <span class="num">S${i+1}</span>
+      <span class="preview">${s.text.substring(0,60)}...</span>
+    </button>
+  `).join('');
+}
+
+// ============================================================
+// RENDER MAIN
+// ============================================================
+function renderMain() {
+  const s = sentences[currentIdx];
+  const panel = document.getElementById('mainPanel');
+  learnedSet.add(currentIdx);
+  document.getElementById('learnedCount').textContent = learnedSet.size;
+  document.getElementById('progressFill').style.width = (learnedSet.size/9*100)+'%';
+
+  // Build token HTML
+  let tokenHtml = s.tokens.map(tok => {
+    if (!tok.role) return `<span>${escHtml(tok.t)}</span>`;
+    return `<span class="token ${tok.role}"
+      data-label="${tok.label||''}"
+      data-desc="${(tok.desc||'').replace(/"/g,'&quot;')}"
+      onmouseenter="showTooltip(event,this)"
+      onmouseleave="hideTooltip()"
+    >${escHtml(tok.t)}</span>`;
+  }).join('');
+
+  // Build analysis cards
+  let cardHtml = s.analysis.map(a => `
+    <div class="ana-card animate__animated animate__fadeInUp">
+      <div class="ac-header">
+        <span class="ac-badge ac-${a.role}">${a.role}</span>
+        <span class="ac-label">${a.label}</span>
+      </div>
+      <div class="ac-content">${escHtml(a.content)}</div>
+      ${a.note ? `<div class="ac-note">💡 ${escHtml(a.note)}</div>` : ''}
+    </div>
+  `).join('');
+
+  // Build tree
+  let treeHtml = s.tree.map((row, ri) => {
+    let indent = '';
+    for(let i=0;i<row.indent;i++) {
+      indent += `<div class="tree-indent"></div>`;
+    }
+    return `<div class="tree-row">
+      ${indent}
+      <span class="tree-connector">${row.indent>0?'└─':''}</span>
+      <span class="ac-badge ac-${row.badge}" style="margin-right:8px;font-size:0.68rem">${row.badge}</span>
+      <span style="font-size:0.82rem;color:#c8d0e7">${escHtml(row.text)}</span>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="sentence-card animate__animated animate__fadeIn">
+      <div class="sent-num">Sentence ${s.id} / 9</div>
+      <div class="sentence-text">${tokenHtml}</div>
+    </div>
+
+    <div class="section-label">成分拆解</div>
+    <div class="analysis-grid">${cardHtml}</div>
+
+    <div class="tree-section">
+      <h3>句子结构树</h3>
+      <div class="tree">${treeHtml}</div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:20px;">
+      <button class="btn btn-secondary" onclick="prevSent()" ${currentIdx===0?'disabled':''}>← 上一句</button>
+      <button class="btn btn-primary" onclick="nextSent()" ${currentIdx===8?'disabled':''}>下一句 →</button>
+      <button class="btn btn-secondary" style="margin-left:auto" onclick="startQuiz()">🎯 测验这个句子</button>
+    </div>
+  `;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function selectSentence(i) {
+  currentIdx = i;
+  renderSidebar();
+  renderMain();
+  document.getElementById('mainPanel').scrollTop = 0;
+}
+function nextSent() { if(currentIdx<8){ currentIdx++; renderSidebar(); renderMain(); }}
+function prevSent() { if(currentIdx>0){ currentIdx--; renderSidebar(); renderMain(); }}
+
+// ============================================================
+// TOOLTIP
+// ============================================================
+function showTooltip(e, el) {
+  const tt = document.getElementById('tooltip');
+  document.getElementById('ttRole').textContent = el.dataset.label || '';
+  document.getElementById('ttDesc').textContent = el.dataset.desc || '';
+  tt.style.display = 'block';
+  posTooltip(e);
+}
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+document.addEventListener('mousemove', e => {
+  const tt = document.getElementById('tooltip');
+  if(tt.style.display === 'block') posTooltip(e);
+});
+function posTooltip(e) {
+  const tt = document.getElementById('tooltip');
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if(x + 270 > window.innerWidth) x = e.clientX - 280;
+  if(y + 80 > window.innerHeight) y = e.clientY - 90;
+  tt.style.left = x + 'px';
+  tt.style.top = y + 'px';
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+function startQuiz() {
+  quizIdx = 0;
+  renderQuiz();
+  document.getElementById('quizOverlay').style.display = 'flex';
+}
+function closeQuiz() {
+  document.getElementById('quizOverlay').style.display = 'none';
+  if(quizTotal > 0) {
+    document.getElementById('scoreDisplay').textContent = `测验得分: ${quizScore}/${quizTotal}`;
+  }
+}
+function renderQuiz() {
+  const q = quizQuestions[quizIdx % quizQuestions.length];
+  quizAnswered = false;
+  const s = sentences[q.si];
+  document.getElementById('qSent').textContent = s.text;
+  document.getElementById('qQuestion').textContent = `Q${quizIdx+1}: ${q.q}`;
+  document.getElementById('qFeedback').style.display = 'none';
+  document.getElementById('btnNext').style.display = 'none';
+
+  // shuffle options
+  const opts = [...q.options].sort(()=>Math.random()-0.5);
+  document.getElementById('qOptions').innerHTML = opts.map(o =>
+    `<button class="quiz-opt" onclick="answerQuiz(this,'${escHtml(o)}','${escHtml(q.correct)}')">${escHtml(o)}</button>`
+  ).join('');
+}
+function answerQuiz(btn, chosen, correct) {
+  if(quizAnswered) return;
+  quizAnswered = true;
+  quizTotal++;
+  const fb = document.getElementById('qFeedback');
+  const allOpts = document.querySelectorAll('.quiz-opt');
+  allOpts.forEach(b => {
+    b.style.pointerEvents = 'none';
+    if(b.textContent.trim() === correct) b.classList.add('correct');
+  });
+  if(chosen === correct) {
+    quizScore++;
+    btn.classList.add('correct');
+    fb.className = 'quiz-feedback ok';
+    fb.textContent = '✅ 答对了！很棒！';
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'quiz-feedback no';
+    fb.textContent = `❌ 答错了，正确答案是：${correct}`;
+  }
+  fb.style.display = 'block';
+  document.getElementById('btnNext').style.display = quizIdx < quizQuestions.length-1 ? 'block' : 'none';
+}
+function nextQuiz() {
+  quizIdx++;
+  if(quizIdx >= quizQuestions.length) {
+    document.getElementById('qSent').textContent = '';
+    document.getElementById('qQuestion').textContent = `🎉 测验完成！`;
+    document.getElementById('qOptions').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;font-size:1.1rem;color:var(--accent2)">最终得分：<strong style="font-size:1.4rem">${quizScore}/${quizTotal}</strong></div>`;
+    document.getElementById('qFeedback').style.display = 'none';
+    document.getElementById('btnNext').style.display = 'none';
+    return;
+  }
+  renderQuiz();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderSidebar();
+renderMain();
+</script>
+</body>
+</html>

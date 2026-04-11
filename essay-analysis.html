@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语作文评析模板</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ── 全局重置 ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --dark:    #1e2a38;
+  --accent:  #1a56db;
+  --red:     #c0392b;
+  --orange:  #e67e22;
+  --green:   #27ae60;
+  --gray:    #64748b;
+  --light:   #f8fafc;
+  --border:  #dde3ec;
+  --bg-blue: #eff6ff;
+  --bg-red:  #fef2f2;
+  --bg-green:#f0fdf4;
+  --bg-orange:#fffbeb;
+}
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  background: #f1f5f9;
+  color: var(--dark);
+  font-size: 14px;
+}
+
+/* ── 顶部工具栏 ────────────────────────────────────────────────────────── */
+#toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--dark);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 24px; height: 52px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+#toolbar h1 {
+  font-size: 15px; font-weight: 600; color: #fff;
+  margin-right: auto; letter-spacing: .5px;
+}
+.tb-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 7px; border: none;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.tb-btn-ghost { background: rgba(255,255,255,.1); color: #fff; }
+.tb-btn-ghost:hover { background: rgba(255,255,255,.2); }
+.tb-btn-primary { background: var(--accent); color: #fff; }
+.tb-btn-primary:hover { background: #1447c0; }
+.tb-btn-danger  { background: var(--red);    color: #fff; }
+.tb-btn-danger:hover  { background: #a02520; }
+#progress-bar {
+  position: absolute; bottom: 0; left: 0; height: 2px;
+  background: var(--accent); width: 0; transition: width .3s;
+}
+
+/* ── 主布局 ────────────────────────────────────────────────────────────── */
+#app {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 0;
+  margin-top: 52px;
+  min-height: calc(100vh - 52px);
+}
+
+/* ── 左：录入面板 ──────────────────────────────────────────────────────── */
+#editor {
+  background: #fff;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  height: calc(100vh - 52px);
+  position: sticky; top: 52px;
+}
+.section-nav {
+  display: flex; overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  gap: 0;
+  scrollbar-width: none;
+}
+.section-nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  flex-shrink: 0; padding: 10px 14px;
+  font-size: 12px; font-weight: 600; color: var(--gray);
+  background: none; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .15s; font-family: inherit;
+  white-space: nowrap;
+}
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-btn:hover { color: var(--dark); }
+
+.editor-panels { padding: 20px; }
+.e-panel { display: none; }
+.e-panel.active { display: block; }
+
+.field-group { margin-bottom: 18px; }
+.field-label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--gray); text-transform: uppercase; letter-spacing: .6px;
+  margin-bottom: 6px;
+}
+.field-label span { font-size: 10px; font-weight: 400; text-transform: none; color: #94a3b8; }
+input[type="text"], textarea, select {
+  width: 100%; padding: 8px 12px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-family: inherit; color: var(--dark);
+  background: #fff; transition: border-color .15s;
+  resize: vertical;
+}
+input[type="text"]:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(26,86,219,.1);
+}
+textarea { min-height: 80px; line-height: 1.6; }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+.subsection-title {
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  margin: 16px 0 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* 错误行 */
+.error-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 8px; align-items: start;
+}
+.error-row input { font-size: 12px; padding: 6px 10px; }
+.add-btn, .del-btn {
+  padding: 5px 10px; border-radius: 6px; border: none;
+  font-size: 12px; cursor: pointer; font-family: inherit;
+  font-weight: 600; transition: all .15s;
+}
+.add-btn { background: var(--bg-blue); color: var(--accent); }
+.add-btn:hover { background: #dbeafe; }
+.del-btn { background: var(--bg-red); color: var(--red); padding: 5px 8px; }
+.del-btn:hover { background: #fee2e2; }
+.error-row-wrap { display: flex; gap: 6px; align-items: start; }
+.error-row-wrap .error-row { flex: 1; }
+.add-row-btn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 12px; border-radius: 6px; border: 1.5px dashed var(--border);
+  color: var(--gray); font-size: 12px; cursor: pointer;
+  background: none; font-family: inherit; width: 100%;
+  justify-content: center; margin-top: 4px; transition: all .15s;
+}
+.add-row-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-blue); }
+
+/* 提示 */
+.tip-box {
+  background: var(--bg-blue); border-left: 3px solid var(--accent);
+  padding: 8px 12px; border-radius: 0 6px 6px 0;
+  font-size: 11px; color: var(--gray); margin-bottom: 14px; line-height: 1.6;
+}
+
+/* ── 右：预览区 ────────────────────────────────────────────────────────── */
+#preview-wrap {
+  overflow-y: auto;
+  background: #cbd5e1;
+  padding: 32px 24px;
+}
+
+/* ── PDF 纸张 ──────────────────────────────────────────────────────────── */
+#pdf-page {
+  width: 794px; /* A4 @96dpi */
+  margin: 0 auto;
+  background: #fff;
+  padding: 50px 52px;
+  box-shadow: 0 4px 32px rgba(0,0,0,.15);
+  font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.6;
+  color: var(--dark);
+}
+
+/* ── PDF 内部样式 ──────────────────────────────────────────────────────── */
+.pdf-h1 {
+  font-size: 22pt; font-weight: 700; color: var(--dark);
+  margin-bottom: 4px; line-height: 1.2;
+}
+.pdf-sub { font-size: 10pt; color: var(--gray); margin-bottom: 10px; }
+.pdf-hr { border: none; border-top: 2px solid var(--accent); margin: 10px 0; }
+.pdf-hr-thin { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+/* 元信息卡片 */
+.meta-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin: 14px 0;
+}
+.meta-card {
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  text-align: center;
+}
+.meta-card-head {
+  padding: 6px 8px; font-size: 8pt; font-weight: 700;
+  color: #fff; letter-spacing: .5px;
+}
+.meta-card-body {
+  padding: 10px 8px; font-size: 11pt; font-weight: 700;
+  line-height: 1.4;
+}
+.meta-card.type .meta-card-head  { background: var(--accent); }
+.meta-card.full .meta-card-head  { background: var(--dark);   }
+.meta-card.score .meta-card-head { background: var(--red);    }
+.meta-card.score .meta-card-body { color: var(--red); font-size: 16pt; }
+
+/* 章节标题 */
+.pdf-section-title {
+  display: flex; align-items: stretch; margin: 20px 0 10px;
+}
+.pdf-section-bar { width: 5px; background: var(--accent); border-radius: 2px; margin-right: 10px; flex-shrink: 0; }
+.pdf-section-text { font-size: 13pt; font-weight: 700; color: var(--accent); line-height: 1.4; }
+
+.pdf-h3 { font-size: 11pt; font-weight: 700; margin: 12px 0 6px; color: var(--dark); }
+.pdf-p  { font-size: 10pt; margin-bottom: 5px; line-height: 1.7; }
+.pdf-small { font-size: 8.5pt; color: var(--gray); line-height: 1.6; }
+.pdf-note  { font-size: 8.5pt; color: var(--gray); line-height: 1.6; margin-top: 4px; font-style: italic; }
+
+/* 原文段落 */
+.orig-para { margin-bottom: 6px; }
+.orig-label {
+  display: inline-block; background: var(--orange);
+  color: #fff; font-size: 8pt; font-weight: 700;
+  padding: 2px 8px; border-radius: 3px 3px 0 0; margin-bottom: 0;
+}
+.orig-body {
+  background: var(--bg-orange); border: 1px solid var(--orange);
+  border-radius: 0 6px 6px 6px;
+  padding: 8px 14px; font-family: 'Courier New', monospace; font-size: 9.5pt;
+  line-height: 1.8;
+}
+
+/* 评分块 */
+.score-block {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  background: var(--bg-red); border: 1px solid var(--red);
+  border-radius: 8px; padding: 14px 20px; margin: 10px 0;
+  text-align: center; align-items: center; gap: 10px;
+}
+.score-num { font-size: 40pt; font-weight: 700; color: var(--red); line-height: 1; }
+.score-lbl { font-size: 9pt; color: var(--gray); margin-bottom: 4px; }
+.score-note { font-size: 9pt; color: var(--gray); line-height: 1.6; }
+
+/* 表格 */
+.pdf-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 8px 0; }
+.pdf-table th {
+  background: #374151; color: #fff; padding: 7px 10px;
+  text-align: left; font-size: 9pt; font-weight: 600;
+}
+.pdf-table td { padding: 6px 10px; border: 1px solid var(--border); vertical-align: top; }
+.pdf-table tr:nth-child(even) td { background: var(--light); }
+.pdf-table .head-cn { background: var(--dark); color: #fff; font-weight: 700; }
+
+.td-red   { color: var(--red);   font-family: 'Courier New', monospace; }
+.td-green { color: var(--green); font-family: 'Courier New', monospace; font-weight: 600; }
+
+/* 任务表格 */
+.task-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 8px 0; }
+.task-table .row-ok  td { background: var(--bg-green); }
+.task-table .row-bad td { background: var(--bg-red);   }
+.task-table th { background: var(--dark); color: #fff; padding: 7px 10px; text-align: left; font-size: 9pt; }
+.task-table td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; }
+.badge-ok  { color: var(--green); font-weight: 700; }
+.badge-bad { color: var(--red);   font-weight: 700; }
+
+/* 对比框 */
+.cmp-box { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 6px 0; }
+.cmp-row { display: grid; grid-template-columns: 50px 1fr; font-size: 9pt; }
+.cmp-row .lbl { padding: 6px 8px; font-size: 8pt; font-weight: 700; color: var(--gray); display: flex; align-items: center; }
+.cmp-row .val { padding: 6px 10px; font-family: 'Courier New', monospace; font-size: 9pt; }
+.cmp-row.orig .lbl, .cmp-row.orig .val { background: var(--bg-red);   }
+.cmp-row.sugg .lbl, .cmp-row.sugg .val { background: var(--bg-green); }
+.cmp-row.note .lbl, .cmp-row.note .val { background: var(--light); font-family: inherit; font-size: 8.5pt; color: var(--gray); }
+.cmp-row.orig .val { color: var(--red); }
+.cmp-row.sugg .val { color: var(--green); font-weight: 600; }
+
+/* 修改版作文 */
+.revised-box {
+  background: var(--bg-blue); border: 1.5px solid var(--accent);
+  border-radius: 8px; padding: 16px 20px;
+  font-family: 'Times New Roman', serif; font-size: 10pt; line-height: 1.9;
+  white-space: pre-wrap;
+}
+.revised-box .rev-para { margin-bottom: 12px; }
+
+/* 建议列表 */
+.advice-item { margin-bottom: 14px; }
+.advice-item .ai-title { font-weight: 700; font-size: 10.5pt; color: var(--dark); margin-bottom: 5px; }
+.advice-item .ai-list  { padding-left: 14px; }
+.advice-item .ai-list li { font-size: 9.5pt; line-height: 1.8; color: var(--dark); }
+.advice-item .ai-list li.eng { font-family: 'Courier New', monospace; }
+
+/* 档次表 */
+.grade-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+.grade-table th { background: var(--dark); color: #fff; padding: 7px 10px; text-align: left; }
+.grade-table td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: middle; }
+.grade-table .g-high   td { background: var(--light); }
+.grade-table .g-mid    td { background: var(--bg-green); }
+.grade-table .g-low    td { background: var(--bg-red); }
+.grade-table .g-poor   td { background: var(--light); }
+.tag-target { color: var(--green); font-weight: 700; font-size: 9pt; }
+.tag-here   { color: var(--red);   font-weight: 700; font-size: 9pt; }
+
+/* 页脚 */
+.pdf-footer { text-align: center; font-size: 8.5pt; color: #94a3b8; margin-top: 28px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+/* ── 打印 ──────────────────────────────────────────────────────────────── */
+@media print {
+  body { background: #fff; }
+  #toolbar, #editor { display: none !important; }
+  #app { display: block; margin-top: 0; }
+  #preview-wrap { padding: 0; background: #fff; }
+  #pdf-page { box-shadow: none; margin: 0; width: 100%; padding: 20mm 22mm; }
+  .meta-cards { page-break-inside: avoid; }
+  .orig-para  { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- 工具栏 -->
+<div id="toolbar">
+  <h1>英语作文评析模板</h1>
+  <button class="tb-btn tb-btn-ghost" onclick="resetForm()">重置</button>
+  <button class="tb-btn tb-btn-ghost" onclick="window.print()">打印</button>
+  <button class="tb-btn tb-btn-primary" id="pdf-btn" onclick="exportPDF()">下载 PDF</button>
+  <div id="progress-bar"></div>
+</div>
+
+<!-- 主体 -->
+<div id="app">
+
+  <!-- 左：录入 -->
+  <div id="editor">
+    <div class="section-nav">
+      <button class="nav-btn active" data-panel="p-basic">基本信息</button>
+      <button class="nav-btn" data-panel="p-orig">原文</button>
+      <button class="nav-btn" data-panel="p-score">总体评价</button>
+      <button class="nav-btn" data-panel="p-task">任务完成</button>
+      <button class="nav-btn" data-panel="p-lang">语言问题</button>
+      <button class="nav-btn" data-panel="p-struct">结构表达</button>
+      <button class="nav-btn" data-panel="p-advice">改进建议</button>
+      <button class="nav-btn" data-panel="p-revised">修改版</button>
+      <button class="nav-btn" data-panel="p-grade">档次对照</button>
+    </div>
+    <div class="editor-panels">
+
+      <!-- 基本信息 -->
+      <div class="e-panel active" id="p-basic">
+        <div class="tip-box">填写报告的基础信息，将显示在 PDF 标题区域。</div>
+        <div class="field-group">
+          <label class="field-label">报告标题</label>
+          <input type="text" id="title" value="上海高考英语作文评析报告">
+        </div>
+        <div class="field-group">
+          <label class="field-label">副标题（英文）</label>
+          <input type="text" id="subtitle" value="Shanghai College Entrance Examination — Writing Assessment">
+        </div>
+        <div class="row-3">
+          <div class="field-group">
+            <label class="field-label">题目类型</label>
+            <input type="text" id="type" value="英文提案 Proposal Writing">
+          </div>
+          <div class="field-group">
+            <label class="field-label">满分</label>
+            <input type="text" id="fullscore" value="25 分">
+          </div>
+          <div class="field-group">
+            <label class="field-label">预计得分</label>
+            <input type="text" id="estscore" value="8 - 11 分">
+          </div>
+        </div>
+      </div>
+
+      <!-- 原文 -->
+      <div class="e-panel" id="p-orig">
+        <div class="tip-box">将原文按自然段落填入，每段单独填写，最多支持 5 段。段落标签可自定义。</div>
+        <div id="orig-paras"></div>
+        <button class="add-row-btn" onclick="addOrigPara()">+ 添加段落</button>
+        <div class="field-group" style="margin-top:14px;">
+          <label class="field-label">注释 <span>（如笔误说明等）</span></label>
+          <textarea id="orig-note" rows="2">* 原文首句 "These trips about..." 中 "trips" 系笔误，正确应为 "tips"（建议/要点），本报告后续语言问题部分不将此计入词汇误用错误。</textarea>
+        </div>
+      </div>
+
+      <!-- 总体评价 -->
+      <div class="e-panel" id="p-score">
+        <div class="row-2">
+          <div class="field-group">
+            <label class="field-label">预计分数（大字显示）</label>
+            <input type="text" id="score-display" value="8-11">
+          </div>
+          <div class="field-group">
+            <label class="field-label">副注（分数旁）</label>
+            <input type="text" id="score-note" value="距目标分数 16 分，尚有明显差距">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">总体描述 <span>（每行一条，将渲染为列表）</span></label>
+          <textarea id="summary-text" rows="6">这篇作文的主要问题不在于思路，而在于：
+（1）任务未完整覆盖，尤其缺失实施步骤（占题目要求 1/3）；
+（2）基础语言错误高频出现，包括语法错误与拼写错误；
+（3）表达不符合正式提案文体，结构松散，逻辑连接词缺失。
+若优先提升结构完整性并减少基础错误，可以较快提升至中档（14-16 分）。</textarea>
+        </div>
+      </div>
+
+      <!-- 任务完成度 -->
+      <div class="e-panel" id="p-task">
+        <div class="tip-box">状态选项：基本完成 / 部分完成 / 严重不足 / 基本缺失</div>
+        <div id="task-rows"></div>
+        <button class="add-row-btn" onclick="addTaskRow()">+ 添加任务项</button>
+        <div class="field-group" style="margin-top:14px;">
+          <label class="field-label">底部备注</label>
+          <textarea id="task-note" rows="2">在上海高考评分体系中，任务未完整覆盖会直接压低档次，从中档（16 分）区间降至低档，这是本文得分不足的核心原因之一。</textarea>
+        </div>
+      </div>
+
+      <!-- 语言问题 -->
+      <div class="e-panel" id="p-lang">
+        <div class="subsection-title">4.1 语法错误</div>
+        <div id="grammar-rows"></div>
+        <button class="add-row-btn" onclick="addGrammarRow()">+ 添加语法错误</button>
+
+        <div class="subsection-title" style="margin-top:18px;">4.2 拼写错误</div>
+        <div id="spell-rows"></div>
+        <button class="add-row-btn" onclick="addSpellRow()">+ 添加拼写错误</button>
+        <div class="field-group" style="margin-top:10px;">
+          <label class="field-label">拼写错误备注</label>
+          <textarea id="spell-note" rows="2">上海高考阅卷对频繁出现的拼写错误有明确扣分项，此处五个拼写错误集中出现，对评分印象影响较大。</textarea>
+        </div>
+
+        <div class="subsection-title" style="margin-top:18px;">4.3 词汇误用</div>
+        <div id="vocab-rows"></div>
+        <button class="add-row-btn" onclick="addVocabRow()">+ 添加词汇误用</button>
+      </div>
+
+      <!-- 结构与表达 -->
+      <div class="e-panel" id="p-struct">
+        <div class="tip-box">每条包含标题、原文、建议改法、说明。</div>
+        <div id="struct-rows"></div>
+        <button class="add-row-btn" onclick="addStructRow()">+ 添加问题项</button>
+      </div>
+
+      <!-- 改进建议 -->
+      <div class="e-panel" id="p-advice">
+        <div class="tip-box">每条建议包含标题和若干条目，条目中以 [en] 开头的将以等宽英文字体显示。</div>
+        <div id="advice-rows"></div>
+        <button class="add-row-btn" onclick="addAdviceRow()">+ 添加建议项</button>
+      </div>
+
+      <!-- 修改版作文 -->
+      <div class="e-panel" id="p-revised">
+        <div class="field-group">
+          <label class="field-label">章节说明</label>
+          <textarea id="revised-desc" rows="2">以下为学生在原文基础上自行修改的版本，三项任务要求基本覆盖，语言表达明显提升，可作为进一步打磨的蓝本。</textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">修改版作文正文 <span>（直接粘贴，段落间空行分隔）</span></label>
+          <textarea id="revised-text" rows="14">I am Li Hua from Mingqi High School. On behalf of the Environmental Club, I would like to propose a potentially practical activity called the "Energy-Saving Challenge" for Green Campus Week.
+
+The purpose of this activity is to raise students' awareness of environmental protection and encourage them to develop energy-saving habits. By taking part in this challenge, students can realize the importance of saving electricity and contribute to building a greener campus.
+
+To carry out this activity, several steps can be taken. First, posters and announcements will be used to introduce the challenge and call on students to participate. Second, students are required to turn off lights, fans and electronic devices when leaving classrooms. Finally, a weekly evaluation will be held, and classes with the best performance will be awarded.
+
+We hope this proposal will be accepted, and thank you for taking my suggestions into consideration.</textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">简评</label>
+          <textarea id="revised-comment" rows="3">修改版三段式结构清晰，三项任务全部覆盖；"potentially practical" 搭配略显冗余，可改为 "practical"；整体语言表达规范，预计分数可达 16-18 分区间。</textarea>
+        </div>
+      </div>
+
+      <!-- 档次对照 -->
+      <div class="e-panel" id="p-grade">
+        <div class="tip-box">标记选项：current（原文档次，红色）/ target（修改版目标，绿色）/ 留空</div>
+        <div id="grade-rows"></div>
+        <button class="add-row-btn" onclick="addGradeRow()">+ 添加档次</button>
+      </div>
+
+    </div><!-- /editor-panels -->
+  </div><!-- /editor -->
+
+  <!-- 右：预览 -->
+  <div id="preview-wrap">
+    <div id="pdf-page"><!-- 动态渲染 --></div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// 默认数据
+// ════════════════════════════════════════════════════════════════════════════
+const defaults = {
+  origParas: [
+    { label: "第一段（开头）", text: 'These tips about Green Campus Week — I\'m Li Hua from Ming Qi school.\nAbout "Green Campus Week" activity, I have some suggestions to you.' },
+    { label: "第二段（活动说明）", text: "In my opinion, I think the challenge of save energy is good activity in this week.\nThe first, we appeal to student at they go away classroom, they can put up lamp, electric blackbroad, fan...\nThis trip will can save penty of electry." },
+    { label: "第三段（展开论述）", text: "It only is one classroom, our school have many classroom,\nIf every classroom are order to my suggestion, it will save so mch electry.\nBecause in my research, I find many classroom have no student, but it lamp have still light.\nbut only less classroom havve turn down the lamp.\nThose are my opinion, I really hope my opinion will adapt. Thank you!" },
+  ],
+  taskRows: [
+    { req: "（1）提议一项具体环保活动", status: "基本完成", note: "提出节能挑战，但活动形式模糊，缺少竞赛/打卡等具体形式描述" },
+    { req: "（2）目的与预期效果", status: "严重不足", note: "仅提及节电，未涉及环保意识提升、行为养成或校园影响等维度" },
+    { req: "（3）具体实施步骤", status: "基本缺失", note: "仅一句「离开教室关灯」，缺少组织方式、执行流程、监督机制" },
+  ],
+  grammarRows: [
+    { type: "动名词形式错误", wrong: "the challenge of save energy",    right: "the challenge of saving energy" },
+    { type: "主谓不一致",     wrong: "our school have many classroom",   right: "our school has many classrooms" },
+    { type: "句子结构混乱",   wrong: "they go away classroom",           right: "when they leave the classroom" },
+    { type: "情态动词连用",   wrong: "This trip will can save...",       right: "This will save... / This can save..." },
+    { type: "代词指代不清",   wrong: "it lamp have still light",         right: "the lights are still on" },
+  ],
+  spellRows: [
+    { wrong: "electry",    right: "electricity" },
+    { wrong: "penty",      right: "plenty" },
+    { wrong: "mch",        right: "much" },
+    { wrong: "havve",      right: "have" },
+    { wrong: "blackbroad", right: "blackboard / smart board" },
+  ],
+  vocabRows: [
+    { wrong: "put up lamp",          right: "turn off the lights",             note: '"put up" 意为张贴/举起，应为 turn off（关闭）' },
+    { wrong: "electric blackboard",  right: "electronic blackboard / smart board", note: 'electric 指通电设备，应为 electronic（电子的）' },
+    { wrong: "appeal to student at", right: "encourage students to",           note: '介词搭配错误，且 student 缺少复数形式' },
+    { wrong: "order to my suggestion",right:"follow my suggestion",           note: '"order to" 为中式英语直译，语义不通' },
+  ],
+  structRows: [
+    { title: "开头不规范",     wrong: "I have some suggestions to you.",             right: "I would like to propose an activity for the upcoming Green Campus Week.", note: "缺少正式提案的开篇格式，直接进入建议显得突兀" },
+    { title: "逻辑连接词缺失", wrong: "（文中几乎无逻辑词）",                        right: "To begin with... / In addition... / As a result... / Therefore...",      note: "各句之间缺乏衔接，文章读来零散，不具备提案的逻辑层次" },
+    { title: "结尾不符合提案规范", wrong: "Those are my opinion, I really hope my opinion will adapt.", right: "We sincerely hope this proposal will be taken into consideration.", note: '"adapt" 误用（应为 adopted 或 considered），结尾过于随意' },
+  ],
+  adviceRows: [
+    { title: "强制三段式结构", items: ["Paragraph 1：活动介绍（What — 活动名称、形式、时间）","Paragraph 2：目的与预期效果（Why — 提升意识、养成习惯、校园影响）","Paragraph 3：实施步骤（How — 至少 3 条，涵盖组织、执行、评比）"] },
+    { title: "使用安全句型（降低错误率）", items: ["[en]We suggest organizing a ... activity during the Green Campus Week.","[en]The purpose of this activity is to ...","[en]First, ... Second, ... Finally, ...","[en]We hope this proposal will be taken into consideration."] },
+    { title: "优先写短句，保证语法正确", items: ["当前主要问题并非表达不够高级，而是基础错误过多。","策略：写短句 -> 保证正确 -> 再逐步增加句式复杂度。","每句话动笔前先确认：主语、谓语、时态是否一致。"] },
+    { title: "建立固定表达库", items: ["[en]turn off the lights when leaving / save electricity","[en]raise environmental awareness / develop eco-friendly habits","[en]take part in / participate in / be responsible for","[en]it is our responsibility to... / we are committed to..."] },
+  ],
+  gradeRows: [
+    { grade: "高档",   range: "20-25", desc: "任务全覆盖，语言地道流畅，结构严谨，几乎无错误", mark: "" },
+    { grade: "中档",   range: "14-19", desc: "任务基本覆盖，语言尚可，有少量错误，结构完整",   mark: "target" },
+    { grade: "低档",   range: "8-13",  desc: "任务覆盖不全，语言错误较多，有理解障碍，结构不完整", mark: "current" },
+    { grade: "极低档", range: "0-7",   desc: "大量错误，内容严重偏离，几乎无法理解",            mark: "" },
+  ],
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 初始化动态行
+// ════════════════════════════════════════════════════════════════════════════
+function initRows() {
+  // 原文段落
+  defaults.origParas.forEach(p => addOrigPara(p));
+  // 任务行
+  defaults.taskRows.forEach(r => addTaskRow(r));
+  // 语法
+  defaults.grammarRows.forEach(r => addGrammarRow(r));
+  // 拼写
+  defaults.spellRows.forEach(r => addSpellRow(r));
+  // 词汇
+  defaults.vocabRows.forEach(r => addVocabRow(r));
+  // 结构
+  defaults.structRows.forEach(r => addStructRow(r));
+  // 建议
+  defaults.adviceRows.forEach(r => addAdviceRow(r));
+  // 档次
+  defaults.gradeRows.forEach(r => addGradeRow(r));
+}
+
+function addOrigPara(data={}) {
+  const wrap = document.getElementById('orig-paras');
+  const idx  = wrap.children.length;
+  const div  = document.createElement('div');
+  div.className = 'field-group';
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <input type="text" value="${data.label||'段落'+(idx+1)}" style="width:130px;padding:5px 9px;font-size:12px;" oninput="renderPreview()" placeholder="段落标签">
+      <button class="del-btn" onclick="this.closest('.field-group').remove();renderPreview()">删除</button>
+    </div>
+    <textarea rows="3" oninput="renderPreview()" placeholder="段落文字...">${esc(data.text||'')}</textarea>`;
+  wrap.appendChild(div);
+}
+
+function addTaskRow(data={}) {
+  const wrap = document.getElementById('task-rows');
+  const div  = document.createElement('div');
+  div.className = 'field-group';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:11px;font-weight:700;color:var(--gray);">任务项</span>
+      <button class="del-btn" onclick="this.closest('.field-group').remove();renderPreview()">删除</button>
+    </div>
+    <div class="row-2" style="margin-bottom:8px;">
+      <div><label class="field-label">要求项目</label><input type="text" value="${esc(data.req||'')}" oninput="renderPreview()" placeholder="如：（1）提议一项具体环保活动"></div>
+      <div><label class="field-label">完成情况</label>
+        <select oninput="renderPreview()">
+          ${['基本完成','部分完成','严重不足','基本缺失'].map(s=>`<option ${data.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <label class="field-label">说明</label>
+    <textarea rows="2" oninput="renderPreview()" placeholder="说明文字...">${esc(data.note||'')}</textarea>`;
+  wrap.appendChild(div);
+}
+
+function addGrammarRow(data={}) {
+  const wrap = document.getElementById('grammar-rows');
+  const div  = document.createElement('div');
+  div.className = 'error-row-wrap';
+  div.style.marginBottom = '8px';
+  div.innerHTML = `
+    <div class="error-row" style="grid-template-columns:1fr 1fr 1fr;">
+      <input type="text" value="${esc(data.type||'')}" oninput="renderPreview()" placeholder="错误类型">
+      <input type="text" value="${esc(data.wrong||'')}" oninput="renderPreview()" placeholder="原文错误">
+      <input type="text" value="${esc(data.right||'')}" oninput="renderPreview()" placeholder="正确形式">
+    </div>
+    <button class="del-btn" onclick="this.closest('.error-row-wrap').remove();renderPreview()">×</button>`;
+  wrap.appendChild(div);
+}
+
+function addSpellRow(data={}) {
+  const wrap = document.getElementById('spell-rows');
+  const div  = document.createElement('div');
+  div.className = 'error-row-wrap';
+  div.style.marginBottom = '8px';
+  div.innerHTML = `
+    <div class="error-row">
+      <input type="text" value="${esc(data.wrong||'')}" oninput="renderPreview()" placeholder="错误拼写">
+      <input type="text" value="${esc(data.right||'')}" oninput="renderPreview()" placeholder="正确拼写">
+    </div>
+    <button class="del-btn" onclick="this.closest('.error-row-wrap').remove();renderPreview()">×</button>`;
+  wrap.appendChild(div);
+}
+
+function addVocabRow(data={}) {
+  const wrap = document.getElementById('vocab-rows');
+  const div  = document.createElement('div');
+  div.className = 'field-group';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;';
+  div.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center;">
+      <input type="text" value="${esc(data.wrong||'')}" oninput="renderPreview()" placeholder="误用词汇" style="flex:1;font-size:12px;padding:5px 9px;">
+      <span style="color:var(--gray);font-size:12px;">→</span>
+      <input type="text" value="${esc(data.right||'')}" oninput="renderPreview()" placeholder="正确表达" style="flex:1;font-size:12px;padding:5px 9px;">
+      <button class="del-btn" onclick="this.closest('.field-group').remove();renderPreview()">×</button>
+    </div>
+    <input type="text" value="${esc(data.note||'')}" oninput="renderPreview()" placeholder="说明" style="font-size:12px;padding:5px 9px;">`;
+  wrap.appendChild(div);
+}
+
+function addStructRow(data={}) {
+  const wrap = document.getElementById('struct-rows');
+  const div  = document.createElement('div');
+  div.className = 'field-group';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+      <input type="text" value="${esc(data.title||'')}" oninput="renderPreview()" placeholder="问题标题" style="flex:1;font-weight:700;">
+      <button class="del-btn" style="margin-left:8px;" onclick="this.closest('.field-group').remove();renderPreview()">删除</button>
+    </div>
+    <label class="field-label">原文</label>
+    <input type="text" value="${esc(data.wrong||'')}" oninput="renderPreview()" placeholder="原文问题句" style="margin-bottom:6px;font-family:monospace;">
+    <label class="field-label">建议改法</label>
+    <input type="text" value="${esc(data.right||'')}" oninput="renderPreview()" placeholder="建议句" style="margin-bottom:6px;font-family:monospace;">
+    <label class="field-label">说明</label>
+    <textarea rows="2" oninput="renderPreview()" placeholder="说明...">${esc(data.note||'')}</textarea>`;
+  wrap.appendChild(div);
+}
+
+function addAdviceRow(data={}) {
+  const wrap = document.getElementById('advice-rows');
+  const div  = document.createElement('div');
+  div.className = 'field-group';
+  div.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;';
+  const items = (data.items||[]).join('\n');
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+      <input type="text" value="${esc(data.title||'')}" oninput="renderPreview()" placeholder="建议标题" style="flex:1;font-weight:700;">
+      <button class="del-btn" style="margin-left:8px;" onclick="this.closest('.field-group').remove();renderPreview()">删除</button>
+    </div>
+    <label class="field-label">条目 <span>（每行一条，英文条目以 [en] 开头）</span></label>
+    <textarea rows="4" oninput="renderPreview()" placeholder="条目列表...">${esc(items)}</textarea>`;
+  wrap.appendChild(div);
+}
+
+function addGradeRow(data={}) {
+  const wrap = document.getElementById('grade-rows');
+  const div  = document.createElement('div');
+  div.className = 'field-group';
+  div.style.cssText = 'display:grid;grid-template-columns:60px 70px 1fr 90px 36px;gap:8px;align-items:center;margin-bottom:8px;';
+  div.innerHTML = `
+    <input type="text" value="${esc(data.grade||'')}" oninput="renderPreview()" placeholder="档次" style="font-size:12px;padding:5px 8px;">
+    <input type="text" value="${esc(data.range||'')}" oninput="renderPreview()" placeholder="分数段" style="font-size:12px;padding:5px 8px;">
+    <input type="text" value="${esc(data.desc||'')}" oninput="renderPreview()" placeholder="主要特征" style="font-size:12px;padding:5px 8px;">
+    <select oninput="renderPreview()" style="font-size:12px;padding:5px 8px;">
+      ${['','current','target'].map(v=>`<option value="${v}" ${data.mark===v?'selected':''}>${v||'（无标记）'}</option>`).join('')}
+    </select>
+    <button class="del-btn" onclick="this.closest('.field-group').remove();renderPreview()">×</button>`;
+  wrap.appendChild(div);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 读取数据
+// ════════════════════════════════════════════════════════════════════════════
+function v(id) { return (document.getElementById(id)||{}).value||''; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function nl2br(s) { return esc(s).replace(/\n/g,'<br>'); }
+
+function getOrigParas() {
+  return [...document.querySelectorAll('#orig-paras .field-group')].map(el => ({
+    label: el.querySelector('input').value,
+    text:  el.querySelector('textarea').value,
+  }));
+}
+function getTaskRows() {
+  return [...document.querySelectorAll('#task-rows .field-group')].map(el => ({
+    req:    el.querySelectorAll('input')[0].value,
+    status: el.querySelector('select').value,
+    note:   el.querySelector('textarea').value,
+  }));
+}
+function getGrammarRows() {
+  return [...document.querySelectorAll('#grammar-rows .error-row-wrap')].map(el => {
+    const ins = el.querySelectorAll('input');
+    return { type: ins[0].value, wrong: ins[1].value, right: ins[2].value };
+  });
+}
+function getSpellRows() {
+  return [...document.querySelectorAll('#spell-rows .error-row-wrap')].map(el => {
+    const ins = el.querySelectorAll('input');
+    return { wrong: ins[0].value, right: ins[1].value };
+  });
+}
+function getVocabRows() {
+  return [...document.querySelectorAll('#vocab-rows .field-group')].map(el => {
+    const ins = el.querySelectorAll('input');
+    return { wrong: ins[0].value, right: ins[1].value, note: ins[2].value };
+  });
+}
+function getStructRows() {
+  return [...document.querySelectorAll('#struct-rows .field-group')].map(el => {
+    const ins = el.querySelectorAll('input');
+    return {
+      title: ins[0].value,
+      wrong: ins[1].value,
+      right: ins[2].value,
+      note:  el.querySelector('textarea').value,
+    };
+  });
+}
+function getAdviceRows() {
+  return [...document.querySelectorAll('#advice-rows .field-group')].map(el => ({
+    title: el.querySelector('input').value,
+    items: el.querySelector('textarea').value.split('\n').filter(s=>s.trim()),
+  }));
+}
+function getGradeRows() {
+  return [...document.querySelectorAll('#grade-rows .field-group')].map(el => {
+    const ins = el.querySelectorAll('input');
+    return { grade: ins[0].value, range: ins[1].value, desc: ins[2].value, mark: el.querySelector('select').value };
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 渲染 PDF 预览
+// ════════════════════════════════════════════════════════════════════════════
+function renderPreview() {
+  const page = document.getElementById('pdf-page');
+  page.innerHTML = buildPDFHTML();
+}
+
+function badgeStatus(s) {
+  if (s === '基本完成') return `<span class="badge-ok">${esc(s)}</span>`;
+  return `<span class="badge-bad">${esc(s)}</span>`;
+}
+function gradeRowClass(mark) {
+  if (mark === 'current') return 'g-low';
+  if (mark === 'target')  return 'g-mid';
+  if (mark === '')        return 'g-high';
+  return '';
+}
+
+function buildPDFHTML() {
+  const origParas  = getOrigParas();
+  const taskRows   = getTaskRows();
+  const gramRows   = getGrammarRows();
+  const spellRows  = getSpellRows();
+  const vocabRows  = getVocabRows();
+  const structRows = getStructRows();
+  const adviceRows = getAdviceRows();
+  const gradeRows  = getGradeRows();
+
+  let html = `
+<!-- 标题 -->
+<div class="pdf-h1">${esc(v('title'))}</div>
+<div class="pdf-sub">${esc(v('subtitle'))}</div>
+<hr class="pdf-hr">
+
+<!-- 元信息卡片 -->
+<div class="meta-cards">
+  <div class="meta-card type">
+    <div class="meta-card-head">题目类型</div>
+    <div class="meta-card-body">${nl2br(v('type'))}</div>
+  </div>
+  <div class="meta-card full">
+    <div class="meta-card-head">满 分</div>
+    <div class="meta-card-body">${esc(v('fullscore'))}</div>
+  </div>
+  <div class="meta-card score">
+    <div class="meta-card-head">预计得分</div>
+    <div class="meta-card-body">${esc(v('estscore'))}</div>
+  </div>
+</div>
+
+<!-- 一、原文 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">一、原文</div></div>
+${origParas.map(p=>`
+<div class="orig-para">
+  <div class="orig-label">${esc(p.label)}</div>
+  <div class="orig-body">${nl2br(p.text)}</div>
+</div>`).join('')}
+${v('orig-note') ? `<div class="pdf-note">${nl2br(v('orig-note'))}</div>` : ''}
+
+<!-- 二、总体评价 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">二、总体评价</div></div>
+<div class="score-block">
+  <div><div class="score-lbl">预计分数</div></div>
+  <div class="score-num">${esc(v('score-display'))}</div>
+  <div class="score-note">${nl2br(v('score-note'))}</div>
+</div>
+${v('summary-text').split('\n').filter(l=>l.trim()).map(l=>`<p class="pdf-p">${esc(l)}</p>`).join('')}
+
+<!-- 三、任务完成度 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">三、任务完成度分析</div></div>
+<table class="task-table">
+  <thead><tr><th style="width:38%">要求项目</th><th style="width:18%">完成情况</th><th>说明</th></tr></thead>
+  <tbody>
+    ${taskRows.map(r=>`
+    <tr class="${r.status==='基本完成'?'row-ok':'row-bad'}">
+      <td>${esc(r.req)}</td>
+      <td>${badgeStatus(r.status)}</td>
+      <td class="pdf-small">${esc(r.note)}</td>
+    </tr>`).join('')}
+  </tbody>
+</table>
+${v('task-note') ? `<p class="pdf-note">${esc(v('task-note'))}</p>` : ''}
+
+<!-- 四、语言问题 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">四、语言问题详析</div></div>
+
+<div class="pdf-h3">4.1 语法错误（高频，系统性）</div>
+<table class="pdf-table">
+  <thead><tr><th style="width:28%">错误类型</th><th style="width:36%">原文</th><th>正确形式</th></tr></thead>
+  <tbody>
+    ${gramRows.map(r=>`<tr><td>${esc(r.type)}</td><td class="td-red">${esc(r.wrong)}</td><td class="td-green">${esc(r.right)}</td></tr>`).join('')}
+  </tbody>
+</table>
+
+<div class="pdf-h3">4.2 拼写错误</div>
+<table class="pdf-table">
+  <thead><tr><th style="width:50%">错误拼写</th><th>正确拼写</th></tr></thead>
+  <tbody>
+    ${spellRows.map(r=>`<tr><td class="td-red">${esc(r.wrong)}</td><td class="td-green">${esc(r.right)}</td></tr>`).join('')}
+  </tbody>
+</table>
+${v('spell-note') ? `<p class="pdf-note">${esc(v('spell-note'))}</p>` : ''}
+
+<div class="pdf-h3">4.3 词汇误用（中式英语）</div>
+<table class="pdf-table">
+  <thead><tr><th style="width:28%">误用词汇</th><th style="width:5%"></th><th style="width:30%">正确表达</th><th>说明</th></tr></thead>
+  <tbody>
+    ${vocabRows.map(r=>`<tr><td class="td-red">${esc(r.wrong)}</td><td style="text-align:center;color:#94a3b8">→</td><td class="td-green">${esc(r.right)}</td><td class="pdf-small">${esc(r.note)}</td></tr>`).join('')}
+  </tbody>
+</table>
+
+<!-- 五、结构与表达 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">五、结构与表达问题</div></div>
+${structRows.map(r=>`
+<div class="pdf-h3">${esc(r.title)}</div>
+<div class="cmp-box">
+  <div class="cmp-row orig"><div class="lbl">原文</div><div class="val">${esc(r.wrong)}</div></div>
+  <div class="cmp-row sugg"><div class="lbl">建议</div><div class="val">${esc(r.right)}</div></div>
+  <div class="cmp-row note"><div class="lbl">说明</div><div class="val">${esc(r.note)}</div></div>
+</div>`).join('')}
+
+<!-- 六、改进建议 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">六、可操作改进建议</div></div>
+${adviceRows.map((r,i)=>`
+<div class="advice-item">
+  <div class="ai-title">${i+1}. ${esc(r.title)}</div>
+  <ul class="ai-list">
+    ${r.items.map(item=>{
+      const isEng = item.startsWith('[en]');
+      const text  = isEng ? item.slice(4) : item;
+      return `<li class="${isEng?'eng':''}">${esc(text)}</li>`;
+    }).join('')}
+  </ul>
+</div>`).join('')}
+
+<!-- 七、修改版 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">七、修改版参考作文</div></div>
+<p class="pdf-small" style="margin-bottom:10px;">${esc(v('revised-desc'))}</p>
+<div class="revised-box">${v('revised-text').split('\n\n').map(para=>`<div class="rev-para">${nl2br(para)}</div>`).join('')}</div>
+${v('revised-comment') ? `<p class="pdf-note" style="margin-top:8px;">${nl2br(v('revised-comment'))}</p>` : ''}
+
+<!-- 八、档次对照 -->
+<div class="pdf-section-title"><div class="pdf-section-bar"></div><div class="pdf-section-text">八、上海高考写作评分档次对照</div></div>
+<table class="grade-table">
+  <thead><tr><th style="width:14%">档次</th><th style="width:14%">分数段</th><th>主要特征</th><th style="width:18%">当前状态</th></tr></thead>
+  <tbody>
+    ${gradeRows.map(r=>{
+      let cls = '';
+      if (r.mark==='current') cls = 'g-low';
+      else if (r.mark==='target') cls = 'g-mid';
+      else cls = r.grade.includes('高')?'g-high':'g-poor';
+      let markHtml = '';
+      if (r.mark==='current') markHtml = '<span class="tag-here">原文所在档次</span>';
+      else if (r.mark==='target') markHtml = '<span class="tag-target">修改版目标区间</span>';
+      return `<tr class="${cls}"><td>${esc(r.grade)}</td><td style="text-align:center">${esc(r.range)}</td><td class="pdf-small">${esc(r.desc)}</td><td style="text-align:center">${markHtml}</td></tr>`;
+    }).join('')}
+  </tbody>
+</table>
+
+<!-- 页脚 -->
+<div class="pdf-footer">本报告由模板生成，仅供学习参考，不代表官方评分标准。</div>`;
+
+  return html;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 导航切换
+// ════════════════════════════════════════════════════════════════════════════
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.e-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 导出 PDF（html2canvas + jsPDF）
+// ════════════════════════════════════════════════════════════════════════════
+async function exportPDF() {
+  const btn = document.getElementById('pdf-btn');
+  const bar = document.getElementById('progress-bar');
+  btn.textContent = '生成中...';
+  btn.disabled = true;
+  bar.style.width = '20%';
+
+  try {
+    const page = document.getElementById('pdf-page');
+    const scale = 2;
+    bar.style.width = '40%';
+
+    const canvas = await html2canvas(page, {
+      scale: scale,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+    bar.style.width = '70%';
+
+    const { jsPDF } = window.jspdf;
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+    const imgH = (canvas.height * pdfW) / canvas.width;
+
+    let yPos = 0;
+    let remaining = imgH;
+
+    while (remaining > 0) {
+      if (yPos > 0) pdf.addPage();
+      const srcY = (yPos / imgH) * canvas.height;
+      const sliceH = Math.min(pdfH, remaining);
+      const slicePx = (sliceH / imgH) * canvas.height;
+
+      const sliceCanvas = document.createElement('canvas');
+      sliceCanvas.width  = canvas.width;
+      sliceCanvas.height = slicePx;
+      const ctx = sliceCanvas.getContext('2d');
+      ctx.drawImage(canvas, 0, srcY, canvas.width, slicePx, 0, 0, canvas.width, slicePx);
+      const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(sliceData, 'JPEG', 0, 0, pdfW, sliceH);
+
+      yPos      += sliceH;
+      remaining -= sliceH;
+    }
+
+    bar.style.width = '95%';
+    const filename = (v('title')||'作文评析报告').replace(/\s+/g,'_') + '.pdf';
+    pdf.save(filename);
+    bar.style.width = '100%';
+    setTimeout(()=>{ bar.style.width='0'; }, 1000);
+  } catch(e) {
+    alert('PDF 生成失败：' + e.message);
+    bar.style.width = '0';
+  }
+
+  btn.textContent = '下载 PDF';
+  btn.disabled = false;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 重置
+// ════════════════════════════════════════════════════════════════════════════
+function resetForm() {
+  if (!confirm('确定要重置所有内容吗？')) return;
+  location.reload();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 实时监听静态输入
+// ════════════════════════════════════════════════════════════════════════════
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('input', renderPreview);
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// 启动
+// ════════════════════════════════════════════════════════════════════════════
+initRows();
+renderPreview();
+</script>
+</body>
+</html>

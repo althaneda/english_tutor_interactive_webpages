@@ -1,0 +1,423 @@
+  <meta name="viewport"
+    content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,shrink-to-fit=no" />
+<style>
+:root { --accent: var(--color-text-info); }
+body { margin: 0; }
+.wrap { padding: 1rem 0; font-size: 15px; color: var(--color-text-primary); }
+.section { margin-bottom: 2.5rem; }
+.section-title { font-size: 17px; font-weight: 500; border-bottom: 0.5px solid var(--color-border-secondary); padding-bottom: 8px; margin-bottom: 1.2rem; }
+.item { display: flex; gap: 12px; margin-bottom: 1.2rem; }
+.num { min-width: 28px; font-weight: 500; color: var(--color-text-secondary); font-size: 14px; padding-top: 2px; }
+.content { flex: 1; }
+.ans { display: inline-block; background: var(--color-background-info); color: var(--color-text-info); border-radius: 4px; padding: 1px 8px; font-weight: 500; font-size: 14px; margin-bottom: 5px; }
+.analysis { font-size: 13.5px; color: var(--color-text-secondary); line-height: 1.65; }
+.analysis em { color: var(--color-text-primary); font-style: normal; font-weight: 500; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
+.tab-bar { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-secondary); margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { padding: 8px 14px; cursor: pointer; font-size: 13.5px; color: var(--color-text-secondary); border-bottom: 2px solid transparent; margin-bottom: -0.5px; }
+.tab.active { color: var(--color-text-info); border-bottom: 2px solid var(--color-border-info); font-weight: 500; }
+.panel { display: none; }
+.panel.active { display: block; }
+.ans-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 6px; }
+.badge { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 2px 8px; font-size: 13px; }
+.badge b { color: var(--color-text-info); }
+</style>
+<div class="wrap">
+<div class="tab-bar">
+  <div class="tab active" onclick="show('p1')">I. 连接词</div>
+  <div class="tab" onclick="show('p2')">II. 动词填空</div>
+  <div class="tab" onclick="show('p3')">III. who/whom</div>
+  <div class="tab" onclick="show('p4')">手机步行篇</div>
+  <div class="tab" onclick="show('p5')">无咖啡因茶</div>
+  <div class="tab" onclick="show('p6')">极光篇</div>
+  <div class="tab" onclick="show('p7')">理查三世</div>
+</div>
+
+<div id="p1" class="panel active">
+<div class="section-title">I. Connectives 连接词</div>
+
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="ans">that</div>
+<div class="analysis">先行词为 something（物），定语从句中 <em>that</em> 充当主语，"I thought"是插入语（parenthetical），不影响主谓结构：<em>that [I thought] could help her</em>。注意不可用 which，because "something...that" 是固定搭配，且口语中 which 不常接在不定代词后。</div>
+</div></div>
+
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="ans">it</div>
+<div class="analysis">此处先行词是 "the Hong Kong SAR"，空格后接 <em>had made</em>，整个结构是 "achievements it had made"（宾语从句/定语结构）。注意空格只有一个词，因此不是 "which it"，而是直接用代词 <em>it</em> 回指香港。</div>
+</div></div>
+
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="ans">whoever</div>
+<div class="analysis"><em>whoever</em> = "any person who"，兼作 from 的宾语和后面从句的主语（whoever cares about you）。不能用 who（who 不能做 from 的宾语兼主语），不能用 whom（whom 表宾格，但后面缺主语）。</div>
+</div></div>
+
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="ans">whose</div>
+<div class="analysis">先行词 <em>animals</em>，后面需要所有格：<em>whose company</em> = the animals' company。此处 whose 引导非限定性定语从句，修饰 animals。</div>
+</div></div>
+
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="ans">whose</div>
+<div class="analysis">先行词 <em>pigeons</em>，<em>whose instructions</em> = the pigeons' instructions。所有格关系代词，引导定语从句修饰 pigeons。</div>
+</div></div>
+
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="ans">where</div>
+<div class="analysis">先行词 <em>communities</em>（地点），<em>where</em> 引导定语从句，在从句中作地点状语。</div>
+</div></div>
+
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="ans">where</div>
+<div class="analysis">先行词 <em>markets</em>（市场/地方），用 <em>where</em> 表示"在那些地方"，cast-off items are acceptable。markets 此处比喻为"场所"概念，故用 where。</div>
+</div></div>
+
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="ans">where</div>
+<div class="analysis">先行词 <em>economic climate</em>（经济环境/背景），抽象名词作地点性先行词时用 <em>where</em>，在从句中作状语。</div>
+</div></div>
+
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="ans">Wherever</div>
+<div class="analysis"><em>Wherever you park it</em> = no matter where you park it，让步/条件状语从句，表示"无论停在哪里"。注意句首大写。</div>
+</div></div>
+
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="ans">in order that</div>
+<div class="analysis">三个空格 = 三个词。<em>in order that</em> 引导目的状语从句，意为"以便……"。"busy preserving the present <em>in order that</em> I can live it in the future"——为了将来能活在当下，现在忙于记录保存。也可用 so that，但那只有两个词，不符合三空。</div>
+</div></div>
+
+<div class="item"><div class="num">11.</div><div class="content">
+<div class="ans">Now that</div>
+<div class="analysis">两个空格。<em>Now that</em> = since / given that，引导原因/情况从句：<em>Now that I have those hours back</em>（既然我重新拥有了那些时间）。注意与 now 区别，now that 是连词短语，now 是副词。</div>
+</div></div>
+
+<div class="item"><div class="num">12.</div><div class="content">
+<div class="ans">as soon as</div>
+<div class="analysis">三个空格。<em>as soon as</em> = "一……就……"，表示时间条件：一旦"最佳食用期"到了就应丢弃产品。符合语境逻辑和句子结构。</div>
+</div></div>
+
+<div class="item"><div class="num">13.</div><div class="content">
+<div class="ans">now that</div>
+<div class="analysis">两个空格。<em>now that</em> 引导原因/时间从句：<em>now that smart phones have achieved dominance</em>（既然智能手机已占据主导地位），革命再次来临。</div>
+</div></div>
+
+<div class="item"><div class="num">14.</div><div class="content">
+<div class="ans">for which</div>
+<div class="analysis">两个空格。先行词 <em>days</em>，介词 for + 关系代词 which，意为"公寓可出租的天数"（the number of days for which an apartment can be rented）。也可理解为 that/which 后省略 for，但此处 for which 是规范书面语。</div>
+</div></div>
+
+<div class="item"><div class="num">15.</div><div class="content">
+<div class="ans">so that</div>
+<div class="analysis">两个空格。<em>so that</em> 引导目的从句：公司不需要用冗长的警告来烦扰顾客，<em>so that</em> 重要信息不会被埋没在琐事中。</div>
+</div></div>
+</div>
+
+<div id="p2" class="panel">
+<div class="section-title">II. 动词填空</div>
+
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="ans">Don't lean</div>
+<div class="analysis">祈使句的否定形式：<em>Don't + 动词原形</em>。"or you'll fall off" 是 or 引导的结果从句，进一步说明禁止原因。</div>
+</div></div>
+
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="ans">Not having done</div>
+<div class="analysis">完成式分词短语作原因状语，表示动作先于主句发生：<em>Not having done anything like this before</em> = Because I had not done anything like this before。否定完成分词 = Not having + 过去分词。</div>
+</div></div>
+
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="ans">was occupied</div>
+<div class="analysis"><em>be occupied (in) doing</em> = 忙于做某事。过去时态，与 about a month after moving in 等时间状语一致。注意 occupy 在此为被动语态：<em>I was occupied writing</em>（也可写作 occupied in writing）。</div>
+</div></div>
+
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="ans">will have lost</div>
+<div class="analysis">by + 将来时间点，用<em>将来完成时</em>（will have + 过去分词）：到2020年前，将已经失去……。</div>
+</div></div>
+
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="ans">had spent</div>
+<div class="analysis">by the end of the holiday 是过去时间点，表示到那时"已经"花完，用<em>过去完成时</em>（had + 过去分词）。</div>
+</div></div>
+
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="ans">were told</div>
+<div class="analysis">被动语态，you 是被告知的对象：<em>you were told to wear</em>（别人告诉你穿上那件额外的夹克）。时态与问句语境（过去的假设场景）一致。</div>
+</div></div>
+
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="ans">to be told</div>
+<div class="analysis"><em>only to do sth.</em> 表示"结果却……"（含失望/意外意味）。此处 tell 是被动：顾客把洗衣机送修，<em>only to be told</em>（结果却被告知）需要更换。被动不定式 = to be + 过去分词。</div>
+</div></div>
+
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="ans">are spared</div>
+<div class="analysis">一般现在时被动：钢琴家<em>are spared from</em> this anxiety（被免除了这一烦恼）。钢琴音符已调好，不需像歌手、其他乐手那样每次对音。</div>
+</div></div>
+
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="ans">to be reading</div>
+<div class="analysis"><em>seem + to be doing</em> = 似乎正在做某事，强调动作的持续进行状态。<em>I seem to be reading all day long</em>——好像整天都在读东西（浏览信息），强调当下持续的状态。</div>
+</div></div>
+
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="ans">to have lost</div>
+<div class="analysis"><em>seem + to have done</em> = 似乎已经……，表示在主句时态之前已发生。<em>Her life seemed to have lost all meaning</em>——她的人生似乎已经失去了所有意义（在此之前就已失去）。</div>
+</div></div>
+</div>
+
+<div id="p3" class="panel">
+<div class="section-title">III. who / whom / whoever / whose</div>
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-bottom: 1.2rem; font-size: 13.5px; line-height: 1.8;">
+  <b>核心口诀：</b>用 he 能代入→用 <em>who</em>；用 him 能代入→用 <em>whom</em>；泛指"任何人"→用 <em>whoever/whomever</em>；所有格→用 <em>whose</em>
+</div>
+<div class="grid2">
+<div>
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="ans">whom</div>
+<div class="analysis">介词 <em>to</em> 后接宾格：I spoke to <em>him</em> → to <em>whom</em>。</div>
+</div></div>
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="ans">who</div>
+<div class="analysis">从句中作主语：<em>he</em> will come → <em>who</em> will come。</div>
+</div></div>
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="ans">whoever</div>
+<div class="analysis">泛指"任何你认为值得的人"，whoever 同时是 deserves 的主语和 to 的宾语。</div>
+</div></div>
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="ans">who</div>
+<div class="analysis">从句主语：<em>she</em> helped me → <em>who</em> helped me。</div>
+</div></div>
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="ans">whom</div>
+<div class="analysis">you were talking about <em>him</em> → about <em>whom</em>，宾格。</div>
+</div></div>
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="ans">Whoever</div>
+<div class="analysis">句首，泛指主语"任何想加入的人"，whoever 作整个主语从句的主语。</div>
+</div></div>
+</div>
+<div>
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="ans">whoever</div>
+<div class="analysis">Choose whoever you trust = choose any person that you trust，whoever 在名词从句中作宾语（trust 的宾语），同时整个从句是 choose 的宾语。</div>
+</div></div>
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="ans">whoever</div>
+<div class="analysis">whoever you recommend 整体作宾语从句；whoever 在从句中兼作主语（will attend 的主语）。正式语法用 whomever，但日常及考试中 whoever 均可。</div>
+</div></div>
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="ans">whose</div>
+<div class="analysis">所有格：<em>the candidate's qualifications</em> → <em>whose qualifications</em>。</div>
+</div></div>
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="ans">Whoever</div>
+<div class="analysis">整个从句作主语，whoever 是 invites 的宾语，同时是 will attend 的主语（名词从句主语位用 whoever）。</div>
+</div></div>
+<div class="item"><div class="num">11.</div><div class="content">
+<div class="ans">who</div>
+<div class="analysis">"I believe" 是插入语，去掉后：the person <em>who</em> is responsible → who 作 is responsible 的主语。切勿因 "I believe" 误判为宾格。</div>
+</div></div>
+</div>
+</div>
+</div>
+
+<div id="p4" class="panel">
+<div class="section-title">III. 文章填空：Walking and Using a Phone</div>
+<div class="ans-row">
+<span class="badge">1. <b>absorbed</b></span>
+<span class="badge">2. <b>without</b></span>
+<span class="badge">3. <b>how</b></span>
+<span class="badge">4. <b>if</b></span>
+<span class="badge">5. <b>placed</b></span>
+<span class="badge">6. <b>to get</b></span>
+<span class="badge">7. <b>have passed</b></span>
+<span class="badge">8. <b>extending</b></span>
+<span class="badge">9. <b>yourself</b></span>
+<span class="badge">10. <b>where</b></span>
+</div>
+
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="analysis"><em>absorbed in a device</em>——过去分词短语作后置定语，修饰 people：专注/沉浸在设备中的人。be absorbed in = 全神贯注于……</div>
+</div></div>
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="analysis"><em>without running into trouble</em>——介词 without + 动名词，表示"不惹麻烦地"从A到B。</div>
+</div></div>
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="analysis"><em>adjust how you move</em>——how 引导宾语从句，表示"你移动的方式/步态"。</div>
+</div></div>
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="analysis"><em>if walking makes up a big portion</em>——条件状语从句，表示"如果步行占你日常体力活动的大部分"，then walking slowly may affect fitness。</div>
+</div></div>
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="analysis"><em>the force placed on the neck</em>——过去分词短语作后置定语，修饰 force：施加在颈部和上背部肌肉上的力。</div>
+</div></div>
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="analysis"><em>to get these benefits</em>——不定式作目的状语：要获得这些益处，注意力必须在环境上而非手机上。it appears that to get... = 用不定式引导目的。</div>
+</div></div>
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="analysis"><em>have passed</em>——现在完成时，表示已经发生的立法行为（某些城市已经通过了法律）。</div>
+</div></div>
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="analysis"><em>extending over the years 2011 to 2019</em>——现在分词短语作后置定语，修饰 data：跨越2011至2019年的政府数据。extend over = 延伸/跨越（时间段）。</div>
+</div></div>
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="analysis"><em>yourself</em>——反身代词，主语是 you，putting yourself at risk。</div>
+</div></div>
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="analysis"><em>where accidents are more likely to occur</em>——where 引导定语从句，先行词是 stairs, crosswalks and messy or uneven ground（这些地方）。</div>
+</div></div>
+</div>
+
+<div id="p5" class="panel">
+<div class="section-title">IV. 文章填空：无咖啡因茶</div>
+<div class="ans-row">
+<span class="badge">1. <b>while</b></span>
+<span class="badge">2. <b>What</b></span>
+<span class="badge">3. <b>none</b></span>
+<span class="badge">4. <b>growing</b></span>
+<span class="badge">5. <b>As</b></span>
+<span class="badge">6. <b>Known</b></span>
+<span class="badge">7. <b>above</b></span>
+<span class="badge">8. <b>are exploring</b></span>
+<span class="badge">9. <b>to be bred</b></span>
+<span class="badge">10. <b>has been reported</b></span>
+</div>
+
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="analysis"><em>while it improves mental alertness</em>——while 引导让步状语从句，意为"尽管……但……"（= although/even though）：咖啡因虽然能提高警觉性，但也会导致焦虑等问题。</div>
+</div></div>
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="analysis"><em>What would be agreeable is that...</em>——What 引导主语从句，what = the thing that，整句是主语从句 + 表语从句结构，意为"令人欣喜的是……"。</div>
+</div></div>
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="analysis"><em>little or none of the caffeine</em>——little or none = 极少甚至没有，none 是代词，代替 caffeine，避免重复。固定搭配。</div>
+</div></div>
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="analysis"><em>growing wild in a remote area</em>——现在分词短语作后置定语，修饰 plant：在偏远地区野生生长的植物。</div>
+</div></div>
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="analysis"><em>As they report in the Journal</em>——as 引导方式状语从句，意为"正如他们在期刊中报道的那样"。As 在此 = as + 主语 + 动词，是学术英语常用句式。</div>
+</div></div>
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="analysis"><em>Known locally as Hongyacha</em>——过去分词短语作状语，相当于 As it is known locally as Hongyacha，当地称之为红芽茶。</div>
+</div></div>
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="analysis"><em>above sea level</em>——固定短语，表示高于海平面。在海拔700至1000米之间生长。</div>
+</div></div>
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="analysis"><em>are exploring</em>——现在进行时，表示研究人员目前正在进行的研究行为，强调当下正在进行。</div>
+</div></div>
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="analysis"><em>to be bred</em>——被动不定式，"for new plant varieties to be bred for commercial use"——新品种被培育用于商业用途。注意 breed（培育）的被动形式。</div>
+</div></div>
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="analysis"><em>little progress has been reported</em>——现在完成时被动态：2003年发现无咖啡因咖啡植株后，几乎没有进展被报道（进展甚微）。主语 progress 是不可数名词，故用 has。</div>
+</div></div>
+</div>
+
+<div id="p6" class="panel">
+<div class="section-title">V. 文章填空：极光</div>
+<div class="ans-row">
+<span class="badge">1. <b>coming</b></span>
+<span class="badge">2. <b>they</b></span>
+<span class="badge">3. <b>where</b></span>
+<span class="badge">4. <b>has not happened</b></span>
+<span class="badge">5. <b>called</b></span>
+<span class="badge">6. <b>from</b></span>
+<span class="badge">7. <b>when</b></span>
+<span class="badge">8. <b>to see</b></span>
+<span class="badge">9. <b>whether</b></span>
+<span class="badge">10. <b>those who</b></span>
+</div>
+
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="analysis"><em>coming and going</em>——并列现在分词，与 "going" 对应，修饰光的移动方式，意为"时来时去/忽现忽灭"，like clouds in the wind。</div>
+</div></div>
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="analysis"><em>they</em>——两人都关闭了电报的电力，但"他们"仍然能互相通话。代词指代前文的 a man in Boston 和 a man in Portland。</div>
+</div></div>
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="analysis"><em>where</em>——先行词 the very north of the earth（北极地区），where 引导定语从句表地点：在那里被称为北极光。</div>
+</div></div>
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="analysis"><em>has not happened</em>——现在完成时，since then（自那以后）触发完成时：1859年后再未发生过如此规模的极光事件。</div>
+</div></div>
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="analysis"><em>called the 'solar wind'</em>——过去分词短语作后置定语：something called the solar wind = something that is called the solar wind。</div>
+</div></div>
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="analysis"><em>defend...from</em>——固定搭配，意为"抵御……"（= protect...from）：地球磁场保护地球免受粒子侵袭。</div>
+</div></div>
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="analysis"><em>when this happens</em>——时间状语从句：当太阳粒子撞击大气层粒子时，我们就看到了极光。</div>
+</div></div>
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="analysis"><em>a good place to see</em>——不定式作后置定语，修饰 place：观看极光的好地方。a good place to do sth. 是固定句式。</div>
+</div></div>
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="analysis"><em>whether it will happen</em>——whether 引导宾语从句，表"是否"（= if），用在 be sure of/whether 后更为正式。</div>
+</div></div>
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="analysis"><em>those who do see it</em>——those who = the people who，"那些亲眼见过极光的人"说他们永远不会忘记。两个空格，those who 是固定搭配。</div>
+</div></div>
+</div>
+
+<div id="p7" class="panel">
+<div class="section-title">VI. 文章填空：理查三世遗骨</div>
+<div class="ans-row">
+<span class="badge">1. <b>matched</b></span>
+<span class="badge">2. <b>with</b></span>
+<span class="badge">3. <b>has been dominated</b></span>
+<span class="badge">4. <b>nothing</b></span>
+<span class="badge">5. <b>to seize</b></span>
+<span class="badge">6. <b>where</b></span>
+<span class="badge">7. <b>described</b></span>
+<span class="badge">8. <b>using</b></span>
+<span class="badge">9. <b>what</b></span>
+<span class="badge">10. <b>However</b></span>
+</div>
+
+<div class="item"><div class="num">1.</div><div class="content">
+<div class="analysis"><em>DNA matched that of...</em>——matched（匹配），过去时态。that 是代词，代替 DNA，避免重复：DNA from the bones matched the DNA of existing generations（现存后代的DNA）。</div>
+</div></div>
+<div class="item"><div class="num">2.</div><div class="content">
+<div class="analysis"><em>consistent with</em>——固定搭配，意为"与……相符/一致"：骨骼上的战伤与当代记录相符。</div>
+</div></div>
+<div class="item"><div class="num">3.</div><div class="content">
+<div class="analysis"><em>has been dominated</em>——现在完成时被动态（三词）：理查三世的一生在他1485年去世后就一直被谣言所主导/笼罩。since his death 触发现在完成时。</div>
+</div></div>
+<div class="item"><div class="num">4.</div><div class="content">
+<div class="analysis"><em>stopped at nothing</em>——固定短语，意为"不择手段/无所不为"。Richard 被描绘成为了权力不惜一切的人。</div>
+</div></div>
+<div class="item"><div class="num">5.</div><div class="content">
+<div class="analysis"><em>to seize the power</em>——不定式作目的状语：甚至谋杀侄子，<em>to seize</em>（为了夺取）权力。seize power 是固定搭配，也可用 to gain/to take。</div>
+</div></div>
+<div class="item"><div class="num">6.</div><div class="content">
+<div class="analysis"><em>where the king was supposedly buried</em>——where 引导定语从句，修饰 the municipal carpark（地点）：据说国王被埋葬的那个停车场。</div>
+</div></div>
+<div class="item"><div class="num">7.</div><div class="content">
+<div class="analysis"><em>the deformed arm described in Shakespeare's "Richard III"</em>——过去分词短语作后置定语：莎士比亚《理查三世》中描述的那只畸形手臂（实际骨骼中并无证据）。</div>
+</div></div>
+<div class="item"><div class="num">8.</div><div class="content">
+<div class="analysis"><em>using evidence to argue against...</em>——现在分词短语作伴随状语，表示历史学家希望通过使用证据来反驳"他杀害两位王子"的说法。</div>
+</div></div>
+<div class="item"><div class="num">9.</div><div class="content">
+<div class="analysis"><em>what Richard achieved</em>——what 引导宾语从句，作 focus on 的宾语：专注于理查在两年统治中所取得的成就。what = the things that。</div>
+</div></div>
+<div class="item"><div class="num">10.</div><div class="content">
+<div class="analysis"><em>However cruel Richard III appeared to be in the past</em>——however + 形容词/副词引导让步状语从句，意为"无论理查三世过去看起来多么残忍……"。一个单词，句首大写。</div>
+</div></div>
+</div>
+
+</div>
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</div>

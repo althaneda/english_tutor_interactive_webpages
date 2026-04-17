@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>whoever / who / whose / whom 互动课堂</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #3B6EE0; --orange: #F5A623; --green: #27AE60; --purple: #8B5CF6;
+    --bg: #F7F9FC; --surface: #FFFFFF; --text: #1A1A2E; --muted: #6B7280;
+    --border: #E5E7EB; --radius: 16px;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center; gap: 32px;
+    height: 60px;
+  }
+  .logo {
+    font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+    color: var(--blue);
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .logo svg { width: 24px; height: 24px; }
+  .badge-en { font-size: 10px; font-weight: 600; background: var(--blue); color: #fff; padding: 2px 7px; border-radius: 20px; letter-spacing: 0.5px; }
+
+  .tabs { display: flex; gap: 4px; flex: 1; }
+  .tab {
+    padding: 6px 16px; border-radius: 8px; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    transition: all 0.2s; border: none; background: transparent;
+    white-space: nowrap;
+  }
+  .tab:hover { background: #F3F4F6; color: var(--text); }
+  .tab.active { background: var(--blue); color: #fff; }
+
+  /* ── Main ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* ── Section ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+    margin-bottom: 8px; color: var(--text);
+  }
+  .section-sub {
+    font-size: 15px; color: var(--muted); margin-bottom: 28px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 28px; margin-bottom: 20px;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+
+  /* ── Word Badges ── */
+  .word-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .word-badge {
+    border-radius: 14px; padding: 20px 16px; text-align: center; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+  }
+  .word-badge:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .word-badge.who    { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); }
+  .word-badge.whom   { background: linear-gradient(135deg, #FEF3C7, #FDE68A); }
+  .word-badge.whose  { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); }
+  .word-badge.whoever{ background: linear-gradient(135deg, #EDE9FE, #DDD6FE); }
+  .word-badge .w { font-size: 32px; font-weight: 800; display: block; margin-bottom: 6px; }
+  .word-badge .w-en { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.55); display: block; margin-bottom: 8px; }
+  .word-badge .w-cn { font-size: 14px; font-weight: 500; color: rgba(0,0,0,0.7); }
+
+  /* ── Detail Cards ── */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  .detail-left, .detail-right { display: flex; flex-direction: column; gap: 16px; }
+
+  .detail-card {
+    background: var(--surface); border-radius: 14px; border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .detail-card .dc-head {
+    padding: 14px 20px; font-weight: 600; font-size: 15px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .dc-head .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .detail-card .dc-body { padding: 0 20px 18px; }
+
+  .rule-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 14px; line-height: 1.6; color: #374151;
+    margin-bottom: 8px;
+  }
+  .rule-item::before { content: '→'; color: var(--blue); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .rule-item.tip::before { content: '★'; color: var(--orange); }
+
+  .example-box {
+    background: #F9FAFB; border-radius: 10px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; border-left: 3px solid var(--blue);
+  }
+  .example-box.en { font-family: 'Inter', sans-serif; font-size: 15px; }
+  .example-box .eg-en { font-weight: 600; color: var(--text); }
+  .example-box .eg-cn { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .example-box .eg-hint { color: var(--blue); font-weight: 600; font-size: 13px; margin-top: 6px; }
+
+  /* ── Formula Section ── */
+  .formula-box {
+    background: linear-gradient(135deg, #1E293B, #0F172A);
+    border-radius: 20px; padding: 32px;
+    color: #fff; margin-bottom: 24px;
+  }
+  .formula-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #FCD34D; }
+  .formula-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .step-card {
+    background: rgba(255,255,255,0.07); border-radius: 14px; padding: 18px;
+    border-top: 3px solid transparent; cursor: pointer;
+    transition: all 0.25s; position: relative;
+  }
+  .step-card:hover { background: rgba(255,255,255,0.13); transform: translateY(-2px); }
+  .step-card.active { background: rgba(255,255,255,0.15); border-top-color: #FCD34D; }
+  .step-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(255,255,255,0.4); margin-bottom: 8px;
+  }
+  .step-card .step-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+  .step-card .step-desc { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+  .step-ans {
+    display: inline-block; margin-top: 10px; padding: 3px 10px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+  }
+  .step-ans.who    { background: #DBEAFE; color: #1D4ED8; }
+  .step-ans.whom   { background: #FEF3C7; color: #B45309; }
+  .step-ans.whose  { background: #D1FAE5; color: #065F46; }
+  .step-ans.whoever{ background: #EDE9FE; color: #5B21B6; }
+
+  .formula-expanded {
+    display: none; margin-top: 16px; background: rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 20px;
+  }
+  .formula-expanded.show { display: block; }
+  .formula-expanded .fe-title { font-size: 14px; font-weight: 600; color: #FCD34D; margin-bottom: 10px; }
+  .formula-expanded .fe-eg { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.8; font-family: 'Inter', sans-serif; }
+  .formula-expanded .fe-cn { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+  .formula-tip {
+    margin-top: 20px; background: #1D4ED8; border-radius: 12px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .formula-tip-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .formula-tip-text { font-size: 14px; color: #DBEAFE; line-height: 1.6; }
+
+  /* ── Comparison Bars ── */
+  .compare-grid { display: flex; flex-direction: column; gap: 12px; }
+  .compare-bar {
+    background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
+    padding: 16px 20px; display: flex; align-items: flex-start; gap: 16px;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .compare-bar:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateX(4px); }
+  .cb-left { flex-shrink: 0; }
+  .cb-badge {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff;
+  }
+  .cb-badge.who    { background: var(--blue); }
+  .cb-badge.whom   { background: var(--orange); }
+  .cb-badge.whose  { background: var(--green); }
+  .cb-badge.whoever{ background: var(--purple); }
+  .cb-content { flex: 1; }
+  .cb-sentence { font-size: 15px; font-weight: 600; color: var(--text); font-family: 'Inter', sans-serif; margin-bottom: 4px; }
+  .cb-reason { font-size: 13px; color: var(--muted); }
+  .cb-answer {
+    flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s; user-select: none;
+  }
+  .cb-answer:hover { transform: scale(1.05); }
+  .cb-answer.who    { background: #DBEAFE; color: #1D4ED8; }
+  .cb-answer.whom   { background: #FEF3C7; color: #B45309; }
+  .cb-answer.whose  { background: #D1FAE5; color: #065F46; }
+  .cb-answer.whoever{ background: #EDE9FE; color: #5B21B6; }
+
+  /* ── Practice Section ── */
+  .quiz-card {
+    background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
+    padding: 24px; margin-bottom: 16px;
+    transition: box-shadow 0.2s;
+  }
+  .quiz-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+  .quiz-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%; background: var(--blue);
+    color: #fff; font-size: 13px; font-weight: 700; margin-right: 10px; flex-shrink: 0;
+  }
+  .quiz-question {
+    font-size: 16px; font-family: 'Inter', sans-serif; color: var(--text);
+    line-height: 1.7; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 8px;
+  }
+  .quiz-question .blank {
+    display: inline-block; min-width: 80px; border-bottom: 2px dashed var(--blue);
+    color: var(--blue); font-weight: 700; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .quiz-question .blank:hover { background: #DBEAFE; }
+  .quiz-question .blank.revealed { border-bottom-style: solid; color: var(--text); }
+  .quiz-question .blank.correct { border-bottom-color: var(--green); color: var(--green); }
+
+  .quiz-options { display: flex; gap: 10px; flex-wrap: wrap; }
+  .quiz-opt {
+    padding: 8px 20px; border-radius: 20px; border: 1.5px solid var(--border);
+    font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all 0.2s; color: var(--muted);
+    user-select: none;
+  }
+  .quiz-opt:hover { border-color: var(--blue); color: var(--blue); background: #EFF6FF; }
+  .quiz-opt.selected { border-color: var(--blue); background: #DBEAFE; color: #1D4ED8; }
+  .quiz-opt.correct  { border-color: var(--green); background: #D1FAE5; color: #065F46; }
+  .quiz-opt.wrong    { border-color: #EF4444; background: #FEE2E2; color: #991B1B; }
+
+  .quiz-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn {
+    padding: 9px 22px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-reveal {
+    background: #F3F4F6; color: var(--text);
+  }
+  .btn-reveal:hover { background: #E5E7EB; }
+  .btn-verify {
+    background: var(--blue); color: #fff;
+  }
+  .btn-verify:hover { background: #2563EB; }
+  .btn-verify:disabled { background: #D1D5DB; cursor: not-allowed; }
+
+  .quiz-feedback {
+    margin-top: 12px; padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; display: none;
+  }
+  .quiz-feedback.show { display: flex; align-items: center; gap: 8px; }
+  .quiz-feedback.right  { background: #D1FAE5; color: #065F46; }
+  .quiz-feedback.wrong   { background: #FEE2E2; color: #991B1B; }
+  .quiz-feedback .fi-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .quiz-feedback.right .fi-icon  { background: var(--green); color: #fff; }
+  .quiz-feedback.wrong .fi-icon  { background: #EF4444; color: #fff; }
+
+  /* ── Quick Ref ── */
+  .ref-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .ref-card {
+    border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .ref-head { padding: 14px 18px; font-weight: 700; font-size: 18px; color: #fff; text-align: center; }
+  .ref-head.who    { background: var(--blue); }
+  .ref-head.whom   { background: var(--orange); }
+  .ref-head.whose  { background: var(--green); }
+  .ref-head.whoever{ background: var(--purple); }
+  .ref-body { padding: 16px; font-size: 13px; line-height: 1.7; }
+  .ref-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .ref-row:last-child { margin-bottom: 0; }
+  .ref-lbl { font-weight: 600; color: var(--muted); min-width: 44px; }
+  .ref-val { color: var(--text); }
+
+  .mnemonic-bar {
+    background: #1E293B; border-radius: 14px; padding: 18px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .mnemonic-bar .mn-icon { width: 36px; height: 36px; background: rgba(252,211,77,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .mnemonic-bar .mn-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+  .mnemonic-bar .mn-text { font-size: 15px; color: #FCD34D; font-weight: 600; font-family: 'Inter', sans-serif; }
+  .mnemonic-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mnemonic-tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .mnemonic-tag.who    { background: #DBEAFE; color: #1D4ED8; }
+  .mnemonic-tag.whom   { background: #FEF3C7; color: #B45309; }
+  .mnemonic-tag.whose  { background: #D1FAE5; color: #065F46; }
+  .mnemonic-tag.whoever{ background: #EDE9FE; color: #5B21B6; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate { opacity: 0; }
+  .animate.in { animation: fadeUp 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+  [data-delay="0"] { animation-delay: 0s; }
+  [data-delay="1"] { animation-delay: 0.08s; }
+  [data-delay="2"] { animation-delay: 0.16s; }
+  [data-delay="3"] { animation-delay: 0.24s; }
+  [data-delay="4"] { animation-delay: 0.32s; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .word-grid { grid-template-columns: repeat(2, 1fr); }
+    .detail-grid { grid-template-columns: 1fr; }
+    .formula-steps { grid-template-columns: repeat(2, 1fr); }
+    .ref-grid { grid-template-columns: repeat(2, 1fr); }
+    .tabs { overflow-x: auto; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tabs { -ms-overflow-style: none; scrollbar-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      高中语法
+      <span class="badge-en">ENGLISH</span>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="words">词汇辨析</button>
+      <button class="tab" data-tab="formula">四步判断法</button>
+      <button class="tab" data-tab="compare">四句对比</button>
+      <button class="tab" data-tab="quiz">课堂练习</button>
+      <button class="tab" data-tab="ref">速查表</button>
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- ── Section 1: 词汇辨析 ── -->
+  <section class="section active" id="sec-words">
+
+    <div class="animate" data-delay="0">
+      <h1 class="section-title">whoever · who · whose · whom</h1>
+      <p class="section-sub">高中语法填空最容易混的一组 — 看从句缺什么成分 + 看意思</p>
+    </div>
+
+    <!-- Word Badges -->
+    <div class="word-grid">
+      <button class="word-badge who animate" data-delay="1" data-word="who">
+        <span class="w">who</span>
+        <span class="w-en">/huː/</span>
+        <span class="w-cn">主语 · 谁</span>
+      </button>
+      <button class="word-badge whom animate" data-delay="2" data-word="whom">
+        <span class="w">whom</span>
+        <span class="w-en">/huːm/</span>
+        <span class="w-cn">宾语 · 谁</span>
+      </button>
+      <button class="word-badge whose animate" data-delay="3" data-word="whose">
+        <span class="w">whose</span>
+        <span class="w-en">/huːz/</span>
+        <span class="w-cn">所有格 · ……的</span>
+      </button>
+      <button class="word-badge whoever animate" data-delay="4" data-word="whoever">
+        <span class="w">whoever</span>
+        <span class="w-en">/huːˈevər/</span>
+        <span class="w-cn">名词性 · 无论谁</span>
+      </button>
+    </div>
+
+    <!-- Detail Cards -->
+    <div class="detail-grid" id="detailGrid">
+      <!-- Left column -->
+      <div class="detail-left">
+
+        <!-- who -->
+        <div class="detail-card animate" data-delay="0" id="card-who">
+          <div class="dc-head">
+            <span class="dot" style="background:var(--blue)"></span>
+            who — 主语
+          </div>
+          <div class="dc-body">
+            <div class="rule-item">在从句中作<strong>主语</strong>（动作发出者）</div>
+            <div class="rule-item tip">引导<strong>定语从句</strong>或<strong>宾语从句</strong>，先行词是<strong>人</strong></div>
+            <div class="example-box en">
+              <div class="eg-en">The girl <strong>who is smiling</strong> is my sister.</div>
+              <div class="eg-cn">那个在笑的女孩是我妹妹。</div>
+              <div class="eg-hint">who 作 is smiling 的主语</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- whom -->
+        <div class="detail-card animate" data-delay="1" id="card-whom">
+          <div class="dc-head">
+            <span class="dot" style="background:var(--orange)"></span>
+            whom — 宾语
+          </div>
+          <div class="dc-body">
+            <div class="rule-item">在从句中作<strong>宾语</strong>（动作承受者）</div>
+            <div class="rule-item tip">常跟在介词后（to whom, with whom…）</div>
+            <div class="example-box en">
+              <div class="eg-en">The man <strong>whom you met</strong> is a teacher.</div>
+              <div class="eg-cn">你见到的那个人是老师。</div>
+              <div class="eg-hint">whom 作 met 的宾语；口语中可换 who</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right column -->
+      <div class="detail-right">
+
+        <!-- whose -->
+        <div class="detail-card animate" data-delay="2" id="card-whose">
+          <div class="dc-head">
+            <span class="dot" style="background:var(--green)"></span>
+            whose — 所有格
+          </div>
+          <div class="dc-body">
+            <div class="rule-item">意思：<strong>……的</strong></div>
+            <div class="rule-item">作<strong>定语</strong>，后面必须紧跟名词</div>
+            <div class="rule-item tip">只要空格 + 名词 → <strong>90% 填 whose</strong></div>
+            <div class="example-box en">
+              <div class="eg-en">I saw a boy <strong>whose bag was lost</strong>.</div>
+              <div class="eg-cn">我看见一个男孩，他的包丢了。</div>
+              <div class="eg-hint">whose + bag（名词）= the bag of the boy</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- whoever -->
+        <div class="detail-card animate" data-delay="3" id="card-whoever">
+          <div class="dc-head">
+            <span class="dot" style="background:var(--purple)"></span>
+            whoever — 名词性
+          </div>
+          <div class="dc-body">
+            <div class="rule-item">意思：<strong>无论谁 / 任何……的人</strong></div>
+            <div class="rule-item">= <strong>anyone who</strong></div>
+            <div class="rule-item tip">引导<strong>名词性从句</strong>（主语/宾语从句），不引导普通定语从句</div>
+            <div class="example-box en">
+              <div class="eg-en">You can ask <strong>whoever helps you</strong>.</div>
+              <div class="eg-cn">你可以问任何帮你的人。</div>
+              <div class="eg-hint">= anyone who helps you；引导宾语从句</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section 2: 四步判断法 ── -->
+  <section class="section" id="sec-formula">
+    <div class="animate" data-delay="0">
+      <h1 class="section-title">四步判断法</h1>
+      <p class="section-sub">点击每一步，展开详细解释与例句</p>
+    </div>
+
+    <div class="formula-box animate" data-delay="1">
+      <div class="formula-title">判断口诀</div>
+      <div class="formula-steps">
+        <div class="step-card" data-step="1">
+          <div class="step-num">STEP 1</div>
+          <div class="step-title">空格后直接跟名词？</div>
+          <div class="step-desc">空格后面紧挨着名词（不缺少主干成分）</div>
+          <div class="step-ans whose">→ whose</div>
+        </div>
+        <div class="step-card" data-step="2">
+          <div class="step-num">STEP 2</div>
+          <div class="step-title">从句缺主语（人）？</div>
+          <div class="step-desc">从句谓语动词前缺人称主语</div>
+          <div class="step-ans who">→ who</div>
+        </div>
+        <div class="step-card" data-step="3">
+          <div class="step-num">STEP 3</div>
+          <div class="step-title">从句缺宾语（人）？</div>
+          <div class="step-desc">从句谓语动词后缺人称宾语</div>
+          <div class="step-ans whom">→ whom</div>
+        </div>
+        <div class="step-card" data-step="4">
+          <div class="step-num">STEP 4</div>
+          <div class="step-title">表示"无论谁 / 任何人"？</div>
+          <div class="step-desc">整句意思偏向"任何人…"</div>
+          <div class="step-ans whoever">→ whoever</div>
+        </div>
+      </div>
+
+      <div id="formulaPanels">
+        <div class="formula-expanded" data-panel="1">
+          <div class="fe-title">STEP 1 — 空格后紧跟名词 → whose</div>
+          <div class="fe-eg">空格 + 名词，此时空格在名词前面作定语修饰名词。</div>
+          <div class="fe-cn">例：The boy <strong>whose father</strong> is a doctor is my classmate.<br>
+          空格后是 father（名词），father 前需用所有格 → whose</div>
+        </div>
+        <div class="formula-expanded" data-panel="2">
+          <div class="fe-title">STEP 2 — 从句缺主语（人）→ who</div>
+          <div class="fe-eg">从句谓语动词前没有任何名词或代词。</div>
+          <div class="fe-cn">例：The woman <strong>who is standing</strong> there is my teacher.<br>
+          is standing 前缺主语，人 → who</div>
+        </div>
+        <div class="formula-expanded" data-panel="3">
+          <div class="fe-title">STEP 3 — 从句缺宾语（人）→ whom</div>
+          <div class="fe-eg">从句谓语动词后面缺一个承受者。</div>
+          <div class="fe-cn">例：This is the person <strong>whom we talked about</strong> just now.<br>
+          talked about 后缺宾语（人），动词及物但缺少宾语 → whom</div>
+        </div>
+        <div class="formula-expanded" data-panel="4">
+          <div class="fe-title">STEP 4 — "无论谁 / 任何人" → whoever</div>
+          <div class="fe-eg">引导名词性从句（主语/宾语从句），整个从句作句子的主语或宾语。</div>
+          <div class="fe-cn">例：<strong>Whoever breaks</strong> the rule will be punished.<br>
+          whoever breaks the rule 整个作主语从句，意思是"任何违反规则的人"→ whoever</div>
+        </div>
+      </div>
+
+      <div class="formula-tip">
+        <div class="formula-tip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="2.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </div>
+        <div class="formula-tip-text">
+          <strong>核心思路：先看空格后有没有名词，再看从句缺什么成分（主语/宾语/所有格），最后看意思偏向"无论谁"。</strong><br>
+          遵循顺序：① 名词检查 → ② 主语/宾语检查 → ③ 意思检查
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section 3: 四句对比 ── -->
+  <section class="section" id="sec-compare">
+    <div class="animate" data-delay="0">
+      <h1 class="section-title">四句对比 · 一眼看懂</h1>
+      <p class="section-sub">点击每句话查看判断依据</p>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-bar animate" data-delay="0">
+        <div class="cb-left"><div class="cb-badge who">who</div></div>
+        <div class="cb-content">
+          <div class="cb-sentence">He is the man <span class="blank-btn" data-ans="who">______</span> helped me.</div>
+          <div class="cb-reason">helped 前缺主语 → 从句主语（人）</div>
+        </div>
+        <div class="cb-answer who" data-ans="who">who</div>
+      </div>
+      <div class="compare-bar animate" data-delay="1">
+        <div class="cb-left"><div class="cb-badge whom">whom</div></div>
+        <div class="cb-content">
+          <div class="cb-sentence">He is the man <span class="blank-btn" data-ans="whom">______</span> I helped.</div>
+          <div class="cb-reason">I helped 后缺宾语 → 从句宾语（人）</div>
+        </div>
+        <div class="cb-answer whom" data-ans="whom">whom</div>
+      </div>
+      <div class="compare-bar animate" data-delay="2">
+        <div class="cb-left"><div class="cb-badge whose">whose</div></div>
+        <div class="cb-content">
+          <div class="cb-sentence">He is the man <span class="blank-btn" data-ans="whose">______</span> son I know.</div>
+          <div class="cb-reason">空格后紧跟名词 son → 所有格</div>
+        </div>
+        <div class="cb-answer whose" data-ans="whose">whose</div>
+      </div>
+      <div class="compare-bar animate" data-delay="3">
+        <div class="cb-left"><div class="cb-badge whoever">whoever</div></div>
+        <div class="cb-content">
+          <div class="cb-sentence">I will help <span class="blank-btn" data-ans="whoever">______</span> needs help.</div>
+          <div class="cb-reason">"任何需要帮助的人" → 名词性从句主语</div>
+        </div>
+        <div class="cb-answer whoever" data-ans="whoever">whoever</div>
+      </div>
+    </div>
+
+    <!-- Additional examples from user content -->
+    <div class="card animate" data-delay="4" style="margin-top: 20px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);">典型真题回顾</div>
+      <div class="compare-grid" style="gap:10px;">
+        <div class="compare-bar" style="cursor:default;">
+          <div class="cb-left"><div class="cb-badge whoever">ever</div></div>
+          <div class="cb-content">
+            <div class="cb-sentence">…from <span class="blank-btn" data-ans="whoever">______</span> cares about you</div>
+            <div class="cb-reason">"来自任何关心你的人" → whoever</div>
+          </div>
+          <div class="cb-answer whoever" data-ans="whoever">whoever</div>
+        </div>
+        <div class="compare-bar" style="cursor:default;">
+          <div class="cb-left"><div class="cb-badge whose">whose</div></div>
+          <div class="cb-content">
+            <div class="cb-sentence">…with <span class="blank-btn" data-ans="whose">______</span> company</div>
+            <div class="cb-reason">空格后是名词 company → whose</div>
+          </div>
+          <div class="cb-answer whose" data-ans="whose">whose</div>
+        </div>
+        <div class="compare-bar" style="cursor:default;">
+          <div class="cb-left"><div class="cb-badge whose">whose</div></div>
+          <div class="cb-content">
+            <div class="cb-sentence">…pigeons <span class="blank-btn" data-ans="whose">______</span> instructions</div>
+            <div class="cb-reason">空格后是名词 instructions → whose</div>
+          </div>
+          <div class="cb-answer whose" data-ans="whose">whose</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section 4: 课堂练习 ── -->
+  <section class="section" id="sec-quiz">
+    <div class="animate" data-delay="0">
+      <h1 class="section-title">课堂练习</h1>
+      <p class="section-sub">共 5 题，点击选项作答，立即反馈正误</p>
+    </div>
+
+    <div id="quizContainer"></div>
+  </section>
+
+  <!-- ── Section 5: 速查表 ── -->
+  <section class="section" id="sec-ref">
+    <div class="animate" data-delay="0">
+      <h1 class="section-title">速查表</h1>
+      <p class="section-sub">考前快速对照，一图记牢四个词</p>
+    </div>
+
+    <div class="ref-grid">
+      <div class="ref-card animate" data-delay="0">
+        <div class="ref-head who">who</div>
+        <div class="ref-body">
+          <div class="ref-row"><span class="ref-lbl">词义</span><span class="ref-val">谁</span></div>
+          <div class="ref-row"><span class="ref-lbl">成分</span><span class="ref-val">主语</span></div>
+          <div class="ref-row"><span class="ref-lbl">位置</span><span class="ref-val">从句主语位</span></div>
+          <div class="ref-row"><span class="ref-lbl">判断</span><span class="ref-val">从句缺主语</span></div>
+          <div class="ref-row"><span class="ref-lbl">例</span><span class="ref-val" style="font-size:12px;">who is smiling</span></div>
+        </div>
+      </div>
+      <div class="ref-card animate" data-delay="1">
+        <div class="ref-head whom">whom</div>
+        <div class="ref-body">
+          <div class="ref-row"><span class="ref-lbl">词义</span><span class="ref-val">谁</span></div>
+          <div class="ref-row"><span class="ref-lbl">成分</span><span class="ref-val">宾语</span></div>
+          <div class="ref-row"><span class="ref-lbl">位置</span><span class="ref-val">从句宾语位</span></div>
+          <div class="ref-row"><span class="ref-lbl">判断</span><span class="ref-val">从句缺宾语</span></div>
+          <div class="ref-row"><span class="ref-lbl">例</span><span class="ref-val" style="font-size:12px;">whom you met</span></div>
+        </div>
+      </div>
+      <div class="ref-card animate" data-delay="2">
+        <div class="ref-head whose">whose</div>
+        <div class="ref-body">
+          <div class="ref-row"><span class="ref-lbl">词义</span><span class="ref-val">……的</span></div>
+          <div class="ref-row"><span class="ref-lbl">成分</span><span class="ref-val">定语</span></div>
+          <div class="ref-row"><span class="ref-lbl">位置</span><span class="ref-val">紧跟名词前</span></div>
+          <div class="ref-row"><span class="ref-lbl">判断</span><span class="ref-val">空格+名词</span></div>
+          <div class="ref-row"><span class="ref-lbl">例</span><span class="ref-val" style="font-size:12px;">whose bag was lost</span></div>
+        </div>
+      </div>
+      <div class="ref-card animate" data-delay="3">
+        <div class="ref-head whoever">whoever</div>
+        <div class="ref-body">
+          <div class="ref-row"><span class="ref-lbl">词义</span><span class="ref-val">无论谁</span></div>
+          <div class="ref-row"><span class="ref-lbl">成分</span><span class="ref-val">名词性</span></div>
+          <div class="ref-row"><span class="ref-lbl">位置</span><span class="ref-val">名词性从句</span></div>
+          <div class="ref-row"><span class="ref-lbl">判断</span><span class="ref-val">无论谁/任何人</span></div>
+          <div class="ref-row"><span class="ref-lbl">例</span><span class="ref-val" style="font-size:12px;">whoever needs help</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mnemonic-bar animate" data-delay="4">
+      <div class="mnemonic-bar .mn-icon" style="display:flex;align-items:center;gap:12px;">
+        <div class="mn-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div>
+          <div class="mn-title">判断口诀</div>
+          <div class="mn-text">空格后名 → whose &nbsp;|&nbsp; 缺主语 → who &nbsp;|&nbsp; 缺宾语 → whom &nbsp;|&nbsp; 无论谁 → whoever</div>
+        </div>
+      </div>
+      <div class="mnemonic-tags">
+        <span class="mnemonic-tag who">who</span>
+        <span class="mnemonic-tag whom">whom</span>
+        <span class="mnemonic-tag whose">whose</span>
+        <span class="mnemonic-tag whoever">whoever</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ── Quiz Data ──
+  const QUIZZES = [
+    {
+      id: 1,
+      sentence: 'The woman _______ is standing there is my teacher.',
+      options: ['who', 'whom', 'whose', 'whoever'],
+      answer: 'who',
+      reason: 'is standing 前缺主语 → 从句主语（人）'
+    },
+    {
+      id: 2,
+      sentence: 'The boy _______ father is a doctor is my classmate.',
+      options: ['who', 'whom', 'whose', 'whoever'],
+      answer: 'whose',
+      reason: '空格后紧跟名词 father → 所有格 whose'
+    },
+    {
+      id: 3,
+      sentence: 'You can invite _______ you like to the party.',
+      options: ['who', 'whom', 'whose', 'whoever'],
+      answer: 'whoever',
+      reason: '"你可以邀请任何你喜欢的人" → whoever'
+    },
+    {
+      id: 4,
+      sentence: '_______ breaks the rule will be punished.',
+      options: ['who', 'whom', 'whose', 'whoever'],
+      answer: 'whoever',
+      reason: '"无论谁违反规则都会受罚" → whoever 引导主语从句'
+    },
+    {
+      id: 5,
+      sentence: 'This is the person _______ we talked about just now.',
+      options: ['who', 'whom', 'whose', 'whoever'],
+      answer: 'whom',
+      reason: 'talked about 后缺宾语（人）→ 从句宾语'
+    }
+  ];
+
+  // ── Tab Navigation ──
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('.section');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.tab;
+      sections.forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + target).classList.add('active');
+      triggerAnimations();
+    });
+  });
+
+  // ── Word Badge → Scroll to Card ──
+  document.querySelectorAll('.word-badge').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const word = btn.dataset.word;
+      const card = document.getElementById('card-' + word);
+      if (card) {
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelector('[data-tab="words"]').classList.add('active');
+        sections.forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-words').classList.add('active');
+        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+        // Highlight effect
+        card.style.boxShadow = '0 0 0 3px var(--blue), 0 8px 24px rgba(59,110,224,0.2)';
+        setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+      }
+    });
+  });
+
+  // ── Formula Steps ──
+  document.querySelectorAll('.step-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const step = card.dataset.step;
+      const isActive = card.classList.contains('active');
+
+      document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.formula-expanded').forEach(p => p.classList.remove('show'));
+
+      if (!isActive) {
+        card.classList.add('active');
+        const panel = document.querySelector('[data-panel="' + step + '"]');
+        if (panel) panel.classList.add('show');
+      }
+    });
+  });
+
+  // ── Compare Bars ──
+  document.querySelectorAll('.blank-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ans = btn.dataset.ans;
+      btn.textContent = ans;
+      btn.classList.add('correct');
+    });
+  });
+  document.querySelectorAll('.cb-answer').forEach(badge => {
+    badge.addEventListener('click', () => {
+      const ans = badge.dataset.ans;
+      const bar = badge.closest('.compare-bar');
+      const blank = bar.querySelector('.blank-btn');
+      if (blank) { blank.textContent = ans; blank.classList.add('correct'); }
+    });
+  });
+
+  // ── Render Quizzes ──
+  function renderQuizzes() {
+    const container = document.getElementById('quizContainer');
+    container.innerHTML = '';
+    QUIZZES.forEach((q, idx) => {
+      const card = document.createElement('div');
+      card.className = 'quiz-card';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;margin-bottom:12px;">
+          <span class="quiz-num">${q.id}</span>
+          <span style="font-size:13px;color:var(--muted);font-weight:500;">判断横线处应填哪个词</span>
+        </div>
+        <div class="quiz-question">
+          ${q.sentence.replace('_______', `<span class="blank" id="blank-${q.id}" onclick="revealAnswer(${q.id}, '${q.answer}')">____</span>`)}
+        </div>
+        <div class="quiz-options" id="opts-${q.id}">
+          ${q.options.map(opt => `<button class="quiz-opt" data-opt="${opt}" onclick="selectOption(${q.id}, '${opt}', '${q.answer}')">${opt}</button>`).join('')}
+        </div>
+        <div class="quiz-actions">
+          <button class="btn btn-reveal" onclick="revealAnswer(${q.id}, '${q.answer}')">显示答案</button>
+          <button class="btn btn-verify" id="verify-btn-${q.id}" onclick="checkAnswer(${q.id}, '${q.answer}')">核对</button>
+        </div>
+        <div class="quiz-feedback" id="feedback-${q.id}">
+          <span class="fi-icon"></span>
+          <span id="feedback-text-${q.id}"></span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function revealAnswer(id, ans) {
+    const blank = document.getElementById('blank-' + id);
+    if (blank) { blank.textContent = ans; blank.classList.add('revealed'); }
+    // Also highlight correct option
+    document.querySelectorAll(`#opts-${id} .quiz-opt`).forEach(opt => {
+      if (opt.dataset.opt === ans) opt.classList.add('correct');
+    });
+  }
+
+  function selectOption(id, selected, answer) {
+    const opts = document.querySelectorAll(`#opts-${id} .quiz-opt`);
+    opts.forEach(o => o.classList.remove('selected'));
+    const btn = document.querySelector(`#opts-${id} [data-opt="${selected}"]`);
+    if (btn) btn.classList.add('selected');
+    // Auto fill blank
+    const blank = document.getElementById('blank-' + id);
+    if (blank && !blank.classList.contains('correct')) {
+      blank.textContent = selected;
+    }
+  }
+
+  function checkAnswer(id, answer) {
+    const opts = document.querySelectorAll(`#opts-${id} .quiz-opt`);
+    let selected = null;
+    opts.forEach(o => { if (o.classList.contains('selected')) selected = o.dataset.opt; });
+    if (!selected) { alert('请先选择一个选项！'); return; }
+
+    const isCorrect = selected === answer;
+    const feedback = document.getElementById('feedback-' + id);
+    const fbText = document.getElementById('feedback-text-' + id);
+
+    feedback.classList.remove('right', 'wrong', 'show');
+    opts.forEach(o => {
+      o.classList.remove('correct', 'wrong');
+      if (o.dataset.opt === answer) o.classList.add('correct');
+      else if (o.classList.contains('selected') && !isCorrect) o.classList.add('wrong');
+    });
+
+    feedback.classList.add(isCorrect ? 'right' : 'wrong');
+    feedback.querySelector('.fi-icon').textContent = isCorrect ? '✓' : '✗';
+    fbText.textContent = isCorrect
+      ? `正确！${QUIZZES.find(q=>q.id===id).reason}`
+      : `不对，答案是 ${answer}。${QUIZZES.find(q=>q.id===id).reason}`;
+    feedback.classList.add('show');
+
+    // Auto reveal blank
+    const blank = document.getElementById('blank-' + id);
+    if (blank) { blank.textContent = answer; blank.classList.add('correct'); }
+  }
+
+  renderQuizzes();
+
+  // ── Animate on Tab Switch ──
+  function triggerAnimations() {
+    const active = document.querySelector('.section.active');
+    if (!active) return;
+    const els = active.querySelectorAll('.animate');
+    els.forEach(el => el.classList.remove('in'));
+    requestAnimationFrame(() => {
+      els.forEach(el => {
+        const delay = parseInt(el.dataset.delay || 0);
+        el.style.animationDelay = (delay * 0.1) + 's';
+        el.classList.add('in');
+      });
+    });
+  }
+
+  // Initial animation
+  document.addEventListener('DOMContentLoaded', triggerAnimations);
+</script>
+</body>
+</html>
